@@ -3,6 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,15 +24,27 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	ruta.GET("/", func(contexto *gin.Context) {
 		contexto.HTML(http.StatusOK, "index.html", gin.H{
-			"Title":    "Integracion Sypago Store",
-			"Heading":  "Productos de prueba",
-			"Message":  "Bienvenido a la seccion de productos, donde podra escoger el articulo que mas le guste, por los mejores precios",
-			"Usuarios": usuario,
+			"Heading": "Pagina principal",
 		})
 	})
 	// ruta.GET("/", func(contexto *gin.Context) {
 	// 	contexto.String(http.StatusOK, "Hola, mundo!")
 	// })
+
+	ruta.GET("/:pagina", func(contexto *gin.Context) {
+
+		pagina := contexto.Param("pagina")
+
+		if !strings.HasSuffix(pagina, ".html") {
+			pagina += ".html"
+		}
+
+		if _, err := os.Stat("templates/" + pagina); err == nil {
+			contexto.HTML(http.StatusOK, pagina, nil)
+		} else {
+			contexto.HTML(http.StatusNotFound, "404.html", nil)
+		}
+	})
 
 	ruta.GET("/saludo/:nombre", func(contexto *gin.Context) {
 		nombre := contexto.Param("nombre")
