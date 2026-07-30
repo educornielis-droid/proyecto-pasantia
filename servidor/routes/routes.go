@@ -22,6 +22,11 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	ruta.Static("/static", "./static") //parte del diseño o funcionalidades del front
 
+	ruta.GET("/api/v1/productos", func(contexto *gin.Context) {
+		contexto.HTML(http.StatusOK, "productos.html", nil)
+		// "Productos": productos
+	})
+
 	ruta.GET("/", func(contexto *gin.Context) {
 		contexto.HTML(http.StatusOK, "index.html", gin.H{
 			"Heading": "Pagina principal",

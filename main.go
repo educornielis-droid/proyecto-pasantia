@@ -1,9 +1,9 @@
 package main
 
 import (
-	"proyecto-golang/servidor"
+	"proyecto-golang/database"
 )
 
 func main() {
-	servidor.Main()
+	database.Main()
 }
