@@ -3,8 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strings"
+	"proyecto-golang/database"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,8 +22,19 @@ func SetupRoutes(ruta *gin.Engine) {
 	ruta.Static("/static", "./static") //parte del diseño o funcionalidades del front
 
 	ruta.GET("/api/v1/productos", func(contexto *gin.Context) {
-		contexto.HTML(http.StatusOK, "productos.html", nil)
-		// "Productos": productos
+		productos, err := database.ObtenerProductos()
+
+		if err != nil {
+			contexto.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error()})
+			return
+		}
+
+		contexto.HTML(http.StatusOK, "productos.html", gin.H{
+			"Title":     "Productos",
+			"Productos": productos,
+		})
+
 	})
 
 	ruta.GET("/", func(contexto *gin.Context) {
@@ -36,20 +46,20 @@ func SetupRoutes(ruta *gin.Engine) {
 	// 	contexto.String(http.StatusOK, "Hola, mundo!")
 	// })
 
-	ruta.GET("/:pagina", func(contexto *gin.Context) {
+	// ruta.GET("/:pagina", func(contexto *gin.Context) {
 
-		pagina := contexto.Param("pagina")
+	// 	pagina := contexto.Param("pagina")
 
-		if !strings.HasSuffix(pagina, ".html") {
-			pagina += ".html"
-		}
+	// 	if !strings.HasSuffix(pagina, ".html") {
+	// 		pagina += ".html"
+	// 	}
 
-		if _, err := os.Stat("templates/" + pagina); err == nil {
-			contexto.HTML(http.StatusOK, pagina, nil)
-		} else {
-			contexto.HTML(http.StatusNotFound, "404.html", nil)
-		}
-	})
+	// 	if _, err := os.Stat("templates/" + pagina); err == nil {
+	// 		contexto.HTML(http.StatusOK, pagina, nil)
+	// 	} else {
+	// 		contexto.HTML(http.StatusNotFound, "404.html", nil)
+	// 	}
+	// })
 
 	ruta.GET("/saludo/:nombre", func(contexto *gin.Context) {
 		nombre := contexto.Param("nombre")
