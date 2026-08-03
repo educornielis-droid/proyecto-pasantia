@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// Struct de Productos (mantenido aquí como querías)
+// Struct de Productos
 type Productos struct {
 	// ProductoID      int     `json:"producto_id"`
 	Nombre          string  `json:"nombre"`
@@ -17,7 +17,7 @@ type Productos struct {
 	Stock           int     `json:"stock"`
 }
 
-// Variable global del paquete database para reutilizar la conexión
+// Variable global del paquete github.com/jackc/pgx/v5 para reutilizar la conexión
 var DB *pgx.Conn
 
 // 1. Función para inicializar la conexión (se llama en el main.go al arrancar la app)

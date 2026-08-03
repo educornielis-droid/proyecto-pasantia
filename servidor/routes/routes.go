@@ -1,44 +1,47 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"strings"
 	"proyecto-golang/database"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Usuarios struct {
-	Nombre string `json:"nombre"`
-	Correo string `json:"correo"`
-}
+// type Usuarios struct {
+// 	Nombre string `json:"nombre"`
+// 	Correo string `json:"correo"`
+// }
 
-var usuario []Usuarios
+// var usuario []Usuarios
 
 func SetupRoutes(ruta *gin.Engine) {
 
 	ruta.LoadHTMLGlob("templates/*.html") //que solo busque archivos html
 
-	ruta.GET("/", func(contexto *gin.Context) {
-		contexto.HTML(http.StatusOK, "index.html", gin.H{
-			"Title":   "SyPago Store",
-			"Heading": "Página principal",
-		})
-	})
-
-	ruta.GET("/index.html", func(contexto *gin.Context) {
-		contexto.HTML(http.StatusOK, "index.html", gin.H{
-			"Title":   "SyPago Store",
-			"Heading": "Página principal",
-		})
-	})
-
 	ruta.Static("/static", "./static") //parte del diseño o funcionalidades del front
 
+	ruta.GET("/app", func(contexto *gin.Context) {
 
-	ruta.GET("/api/v1/productos", func(contexto *gin.Context) {
+		var segments []string
+		// endpoint separado por segmentos
+		if len(segments) < 1 {
+			contexto.HTML(http.StatusOK, "index.html", gin.H{
+				"Title":   "SyPago Store",
+				"Heading": "Página principal",
+			})
+		} else if segments[0] == "productos" {
+
+		} else if segments[0] == "registro" {
+
+		} else if segments[0] == "contactos" {
+
+		} else {
+			contexto.HTML(http.StatusNotFound, "404.html", nil)
+		}
+
+	})
+
+	ruta.GET("/app/productos", func(contexto *gin.Context) {
 		productos, err := database.ObtenerProductos()
 
 		if err != nil {
@@ -54,19 +57,32 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	})
 
-	ruta.GET("/:pagina", func(contexto *gin.Context) {
-
-		pagina := contexto.Param("pagina")
-
-		if !strings.HasSuffix(pagina, ".html") {
-			pagina += ".html"
+	ruta.GET("/api/v1", func(contexto *gin.Context) {
+		productos, err := database.ObtenerProductos()
+		if err != nil {
+			contexto.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error()})
+			return
 		}
 
-		if _, err := os.Stat("templates/" + pagina); err == nil {
-			contexto.HTML(http.StatusOK, pagina, nil)
-		} else {
-			contexto.HTML(http.StatusNotFound, "404.html", nil)
+		contexto.JSON(http.StatusOK, gin.H{
+			"productos": productos,
+		})
+
+	})
+
+	ruta.GET("/api/v1/productos", func(contexto *gin.Context) {
+		productos, err := database.ObtenerProductos()
+		if err != nil {
+			contexto.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error()})
+			return
 		}
+
+		contexto.JSON(http.StatusOK, gin.H{
+			"productos": productos,
+		})
+
 	})
 
 	ruta.GET("/saludo/:nombre", func(contexto *gin.Context) {
@@ -74,35 +90,50 @@ func SetupRoutes(ruta *gin.Engine) {
 		contexto.String(http.StatusOK, "Hola %s, bienvenido", nombre)
 	})
 
-	ruta.POST("/usuarios", func(contexto *gin.Context) {
-		var nuevoUsuario Usuarios
+	// ruta.GET("/:pagina", func(contexto *gin.Context) {
 
-		if err := contexto.BindJSON(&nuevoUsuario); err != nil {
-			fmt.Printf("\nError decodificando body: %v", err)
-			contexto.JSON(http.StatusBadRequest, gin.H{"error": "Error al decodificar el JSON"})
-			return
-		}
+	// 	pagina := contexto.Param("pagina")
 
-		if nuevoUsuario.Nombre == "" || nuevoUsuario.Correo == "" {
-			contexto.JSON(http.StatusBadRequest, gin.H{"error": "Nombre y correo electronico son campos requeridos"})
-			return
-		}
+	// 	if !strings.HasSuffix(pagina, ".html") {
+	// 		pagina += ".html"
+	// 	}
 
-		usuario = append(usuario, nuevoUsuario)
+	// 	if _, err := os.Stat("templates/" + pagina); err == nil {
+	// 		contexto.HTML(http.StatusOK, pagina, nil)
+	// 	} else {
+	// 		contexto.HTML(http.StatusNotFound, "404.html", nil)
+	// 	}
+	// })
 
-		contexto.JSON(http.StatusOK, gin.H{"mensaje": "Usuario registrado", "datos": usuario})
-	})
+	// ruta.POST("/usuarios", func(contexto *gin.Context) {
+	// 	var nuevoUsuario Usuarios
 
-	ruta.GET("/usuarios", func(contexto *gin.Context) {
-		if usuario == nil {
-			contexto.JSON(http.StatusOK, gin.H{
-				"datos": "No se encontraron registros de usuarios actualmente",
-			})
-			return
-		}
-		contexto.JSON(http.StatusOK, gin.H{
-			"datos": usuario,
-		})
-	})
+	// 	if err := contexto.BindJSON(&nuevoUsuario); err != nil {
+	// 		fmt.Printf("\nError decodificando body: %v", err)
+	// 		contexto.JSON(http.StatusBadRequest, gin.H{"error": "Error al decodificar el JSON"})
+	// 		return
+	// 	}
+
+	// 	if nuevoUsuario.Nombre == "" || nuevoUsuario.Correo == "" {
+	// 		contexto.JSON(http.StatusBadRequest, gin.H{"error": "Nombre y correo electronico son campos requeridos"})
+	// 		return
+	// 	}
+
+	// 	usuario = append(usuario, nuevoUsuario)
+
+	// 	contexto.JSON(http.StatusOK, gin.H{"mensaje": "Usuario registrado", "datos": usuario})
+	// })
+
+	// ruta.GET("/usuarios", func(contexto *gin.Context) {
+	// 	if usuario == nil {
+	// 		contexto.JSON(http.StatusOK, gin.H{
+	// 			"datos": "No se encontraron registros de usuarios actualmente",
+	// 		})
+	// 		return
+	// 	}
+	// 	contexto.JSON(http.StatusOK, gin.H{
+	// 		"datos": usuario,
+	// 	})
+	// })
 
 }

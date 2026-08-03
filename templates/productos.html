@@ -1,12 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
-</head>
-<body>
-    <H1>LISTA DE PRODUCTOS</H1>
-    <p>{{.Productos}}</p>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{.Title}}</title>
+        <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <header class="header">
+            <div class="container">
+                
+                <a href="#" class="logo">Sypago Store</a>
+                <input type="checkbox" id="menu"/>
+                <label for="menu">
+                    <i class="fa-solid fa-bars" id="menu-icono"></i>
+                </label>
+                
+                <nav class="classvar">
+                    <ul>
+                        <li><a href="/app">Inicio</a></li>
+                        <li><a href="#">Productos</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                    </ul>
+                </nav>
+
+                <div>
+                    <ul>
+                        <li class="submenu">
+                            <i class="fa-solid fa-cart-shopping" id="logo-carrito"></i>
+                            <div id="carrito">
+                                <table id="lista-carrito">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <!-- <th>Cantidad</th> -->
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </header>
+
+        <section class="productos container" id="lista-2">
+            
+            <h2>Nuevos Productos</h2>
+
+            <div class="swiper mySwiper-2">
+
+                <div class="swiper-wrapper">
+                    
+                    <div class="swiper-slide">
+
+                        {{ range .Productos }}
+                        <div class="swiper-slide">
+                            <div class="producto">
+                                <img src="" alt="{{ .Nombre }}" loading="lazy">
+                                <div class="producto-txt">
+                                    <h3>{{ .Nombre }}</h3>
+                                    <p>{{ .Descripcion }}</p>
+                                    <p>Unidades disponibles:{{ .Stock }}</p>
+                                    <p class="precio">${{ printf "%.2f" .Precio }}</p>
+                                    <a href="#" class="agregar-carrito btn-3" 
+                                    data-nombre="{{ .Nombre }}" 
+                                    data-precio="{{ .Precio }}">
+                                    Agregar al Carrito
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{ else }}
+                            <p>No hay productos disponibles por el momento.</p>
+                        {{ end }}
+
+                    </div>
+
+                </div>
+
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+
+            </div>
+
+            <!-- <H1>LISTA DE PRODUCTOS</H1>
+            <p>{{.Productos}}</p> -->
+        </section>
+
+        <footer class="footer container">
+
+            <div class="link">
+                <h3>Lorem</h3>
+                <ul>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                </ul>
+            </div>
+
+            <div class="link">
+                <h3>Lorem</h3>
+                <ul>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                </ul>
+            </div>
+
+            <div class="link">
+                <h3>Lorem</h3>
+                <p>
+                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptate suscipit ab doloremque, dignissimos
+                    sequi sed? Inventore deserunt cum quas illum. Blanditiis tempore explicabo quis architecto velit
+                    distinctio nulla quisquam eligendi.
+                </p>
+            </div>
+
+        </footer>
+
+    </body>
 </html>
