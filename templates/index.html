@@ -1,13 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
-</head>
-<body>
-    <h1>{{.Heading}}</h1>
-    <p>{{.Message}}</p>
-    <p>{{.Usuarios}}</p>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{.Title}}</title>
+        <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body>
+        <header class="header">
+            <div class="container">
+                
+                <a href="#" class="logo">Logo</a>
+                <input type="checkbox" id="menu"/>
+                <label for="menu">
+                    <i class="fa-solid fa-bars" id="menu-icono"></i>
+                </label>
+                
+                <nav class="classvar">
+                    <ul>
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="#">Productos</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                    </ul>
+                </nav>
+
+                <div>
+                    <ul>
+                        <li class="submenu">
+                            <i class="fa-solid fa-cart-shopping" id="logo-carrito"></i>
+                            <div id="carrito">
+                                <table id="lista-carrito">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <!-- <th>Cantidad</th> -->
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </header>
+        <h1>{{.Heading}}</h1>
+        <script src="/static/js/script.js"></script>
+    </body>
 </html>

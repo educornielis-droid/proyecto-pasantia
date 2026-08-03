@@ -23,7 +23,7 @@ CREATE TABLE productos (
 CREATE TABLE transacciones (
     transaccion_id SERIAL PRIMARY KEY,
     --DATOS REQUERIDOS POR SYPAGO
-    tipo_documento VARCHAR(2) NOT NULL DEFAULT 'V'       --PYEDE SER V, J, E, G
+    tipo_documento VARCHAR(2) NOT NULL DEFAULT 'V',       --PYEDE SER V, J, E, G
     numero_documento VARCHAR(20) NOT NULL,
     tipo_cuenta VARCHAR(4) NOT NULL DEFAULT 'CELE',      -- 'CELE' (Pago Móvil) o 'CNTA' (Cuenta 20 digitos)
     cuenta_o_telefono VARCHAR(20) NOT NULL,     
@@ -31,7 +31,7 @@ CREATE TABLE transacciones (
 
     monto_final_usd NUMERIC(6, 2) NOT NULL CHECK (monto_final_usd > 0),
     monto_final_ves NUMERIC(10, 2) NOT NULL CHECK (monto_final_ves > 0),
-    tasa_cambio NUMERIC(8, 2) NOT NULL CHECK (tasa_cambio > 0)
+    tasa_cambio NUMERIC(8, 2) NOT NULL CHECK (tasa_cambio > 0),
 
     estado_transaccion VARCHAR(20) DEFAULT 'PENDIENTE',
     referencia_sypago VARCHAR(100),
@@ -42,7 +42,7 @@ CREATE TABLE detalles (
     detalle_id SERIAL PRIMARY KEY,
     transaccion_id INT NOT NULL REFERENCES transacciones(transaccion_id) ON DELETE CASCADE,
     producto_id INT NOT NULL REFERENCES productos(producto_id) ON DELETE RESTRICT,
-    cantidad_producto INT NOT NULL CHECK (cantidad_producto > 0),
+    cantidad_producto INT NOT NULL CHECK (cantidad_producto > 0)
 );
 
 CREATE TABLE usuarios (
@@ -77,20 +77,19 @@ GROUP BY t.transaccion_id;
 
 
 
-INSERT INTO usuarios (nombre, contraseña)
-VALUES ('admin', 'admin123')
-ON CONFLICT (nombre) DO NOTHING;
+INSERT INTO usuarios (nombre, apellido, contraseña)
+VALUES ('admin', 'admin', 'admin123');
 
-INSERT INTO productos (nombre, descripcion, precio, stock)
-VALUES ('Camisa Oficial SyPago', 'Camisa 100% de algodon con logo estampado', 15.00, 20),
-('Taza Termica SyPago', 'Taza de acero inoxidable para cafe', 8.50, 15);
+INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock) VALUES 
+(1, 'Camisa Oficial SyPago', 'Camisa 100% de algodon con logo estampado', 15.00, 20),
+(1, 'Taza Termica SyPago', 'Taza de acero inoxidable para cafe', 8.50, 15);
 
 
--- Vista para observar mejor en que categoria esta cada producto
+-- Vista para observar mejor en qué categoría está cada producto
 CREATE VIEW v_productos 
 AS SELECT 
     p.producto_id,
-    c.nombre AS nombre_categoria
+    c.nombre AS nombre_categoria,
     p.nombre,
     p.descripcion,
     p.precio,
@@ -99,18 +98,19 @@ AS SELECT
 FROM productos p
 JOIN categorias c ON p.categoria_id = c.categoria_id;
 
-INSERT INTO categorias (nombre) VALUES
-('Tecnología'),
-('Periféricos'),
-('Audio'),
-('Móviles'),
-('Accesorios'),
-('Gaming'),
-('Almacenamiento'),
-('Smart Home'),
-('Wearables'),
-('Redes'),
-('Oficina')
+INSERT INTO categorias (categoria_id, nombre) VALUES
+(1, 'Ropa y Accesorios'),
+(2, 'Tecnología'),
+(3, 'Periféricos'),
+(4, 'Audio'),
+(5, 'Móviles'),
+(6, 'Accesorios'),
+(7, 'Gaming'),
+(8, 'Almacenamiento'),
+(9, 'Smart Home'),
+(10, 'Wearables'),
+(11, 'Redes'),
+(12, 'Oficina')
 ON CONFLICT (nombre) DO NOTHING;
 
 INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock) VALUES
