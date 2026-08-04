@@ -26,8 +26,7 @@ func SetupRoutes(ruta *gin.Engine) {
 		// endpoint separado por segmentos
 		if len(segments) < 1 {
 			contexto.HTML(http.StatusOK, "index.html", gin.H{
-				"Title":   "SyPago Store",
-				"Heading": "Página principal",
+				"Title": "SyPago Store",
 			})
 		} else if segments[0] == "productos" {
 

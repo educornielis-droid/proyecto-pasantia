@@ -5,10 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{.Title}}</title>
         <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/static/css/style.css">
     </head>
     <body>
-        <header class="header">
-            <div class="container">
+        <header class="header header-productos">
+            <div class="menu container">
                 
                 <a href="#" class="logo">Sypago Store</a>
                 <input type="checkbox" id="menu"/>
@@ -16,7 +17,7 @@
                     <i class="fa-solid fa-bars" id="menu-icono"></i>
                 </label>
                 
-                <nav class="classvar">
+                <nav class="navbar">
                     <ul>
                         <li><a href="/app">Inicio</a></li>
                         <li><a href="#">Productos</a></li>
@@ -53,37 +54,33 @@
 
         <section class="productos container" id="lista-2">
             
-            <h2>Nuevos Productos</h2>
+            <h2>Lista de Productos</h2>
 
             <div class="swiper mySwiper-2">
 
                 <div class="swiper-wrapper">
                     
+                    {{ range .Productos }}
                     <div class="swiper-slide">
-
-                        {{ range .Productos }}
-                        <div class="swiper-slide">
-                            <div class="producto">
-                                <img src="" alt="{{ .Nombre }}" loading="lazy">
-                                <div class="producto-txt">
-                                    <h3>{{ .Nombre }}</h3>
-                                    <p>{{ .Descripcion }}</p>
-                                    <p>Unidades disponibles:{{ .Stock }}</p>
-                                    <p class="precio">${{ printf "%.2f" .Precio }}</p>
-                                    <a href="#" class="agregar-carrito btn-3" 
-                                    data-nombre="{{ .Nombre }}" 
-                                    data-precio="{{ .Precio }}">
-                                    Agregar al Carrito
-                                    </a>
-                                </div>
+                        <div class="producto">
+                            <img src="" alt="{{ .Nombre }}" loading="lazy">
+                            <div class="producto-txt">
+                                <h3>{{ .Nombre }}</h3>
+                                <p>{{ .Descripcion }}</p>
+                                <p>Unidades disponibles:{{ .Stock }}</p>
+                                <p class="precio">${{ printf "%.2f" .Precio }}</p>
+                                <a href="#" class="agregar-carrito btn-3" 
+                                data-nombre="{{ .Nombre }}" 
+                                data-precio="{{ .Precio }}">
+                                Agregar al Carrito
+                                </a>
                             </div>
                         </div>
-
-                        {{ else }}
-                            <p>No hay productos disponibles por el momento.</p>
-                        {{ end }}
-
                     </div>
+
+                    {{ else }}
+                        <p>No hay productos disponibles por el momento.</p>
+                    {{ end }}            
 
                 </div>
 
@@ -118,11 +115,11 @@
 
             <div class="link">
                 <h3>Lorem</h3>
-                <p>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptate suscipit ab doloremque, dignissimos
-                    sequi sed? Inventore deserunt cum quas illum. Blanditiis tempore explicabo quis architecto velit
-                    distinctio nulla quisquam eligendi.
-                </p>
+                <ul>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                </ul>
             </div>
 
         </footer>

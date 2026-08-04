@@ -1,204 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
-    <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
-    <!-- <link rel="stylesheet" href="/static/css/style.css"> -->
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{.Title}}</title>
+        <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="./static/css/style.css">
+    </head>
 
-<body>
-    <header class="header">
-        <div class="container">
+    <body>
+        <header class="header">
+            <div class="menu container">
 
-            <a href="#" class="logo">Sypago Store</a>
-            <input type="checkbox" id="menu" />
-            <label for="menu">
-                <i class="fa-solid fa-bars" id="menu-icono"></i>
-            </label>
+                <a href="#" class="logo">Sypago Store</a>
+                <input type="checkbox" id="menu"/>
+                <label for="menu"><i class="fa-solid fa-bars" id="menu-icono"></i>
+                </label>
 
-            <nav class="classvar">
+                <nav class="navbar">
+                    <ul>
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="/app/productos">Productos</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                    </ul>
+                </nav>
+
+                <div>
+                    <ul>
+                        <li class="submenu">
+                            <i class="fa-solid fa-cart-shopping" id="logo-carrito"></i>
+                            <div id="carrito">
+                                <table id="lista-carrito">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <!-- <th>Cantidad</th> -->
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="header-content container">
+
+                <div class="swiper mySwiper-1">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="header-info">
+                                <div class="header-txt">
+                                    <h1>Laptop Pro 15"</h1>
+                                    <div class="precios">
+                                        <p class="precio">$850</p>
+                                    </div>
+                                    <a href="#" class="btn-1">Información</a>
+                                </div>
+                            </div>
+                            <div class="header-img">
+                                <img src="/static/img/Laptop Pro 15.png" alt="" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div c lass="header-info">
+                                <div class="header-txt">
+                                    <h1>Monitor Gamer 27"</h1>
+                                    <div class="precios">
+                                        <p class="precio">$220</p>
+                                    </div>
+                                    <a href="#" class="btn-1">Información</a>
+                                </div>
+                            </div>
+                            <div class="header-img">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUcqgSXqLjgYJVT4xb0mPxV88Ajm00aBC7CSfoTaMmqGVKbWivFrYMw1Y&s=10"
+                                    alt="" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="header-info">
+                                <div class="header-txt">
+                                    <h1>Teclado Mecánico RGB</h1>
+                                    <div class="precios">
+                                        <p class="precio">$20.5</p>
+                                    </div>
+                                    <a href="#" class="btn-1">Información</a>
+                                </div>
+                            </div>
+                            <div class="header-img">
+                                <img src="https://soytechno.com/wp-content/uploads/2026/06/Redragon-Fizz-K617RGB-MP-Magnetic-Black-1.jpg"
+                                    alt="" loading="lazy">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                </div>
+
+            </div>
+
+        </header>
+
+        <hr>
+
+        <section class="promociones container" id="lista-1">
+
+            <h2>Promociones</h2>
+
+            <div class="secciones"> <!--para no poner "categorias", que ira en el carrusel de productos -->
+
+                <div class="seccion">
+                    <div class="seccion-1">
+                        <h3>Promoción 1</h3>
+                        <div class="precios">
+                            <p class="precio-1">$15.00</p>
+                            <p class="precio-2">$10.50</p>
+                        </div>
+                        <a href="#" class="agregar-carrito btn-3" data-id="1">Agregar al Carrito</a>
+                    </div>
+                    <div class="seccion-img">
+                        <img src="https://img.magnific.com/psd-premium/camisa-negra-logotipo-blanco-frente_1259581-7.jpg?semt=ais_hybrid&w=740&q=80"
+                            alt="" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="seccion">
+                    <div class="seccion-1">
+                        <h3>Promoción 2</h3>
+                        <div class="precios">
+                            <p class="precio-1">$20.50</p>
+                            <p class="precio-2">$14.35</p>
+                        </div>
+                        <a href="#" class="agregar-carrito btn-3" data-id="2">Agregar al Carrito</a>
+                    </div>
+                    <div class="seccion-img">
+                        <img src="https://www.shutterstock.com/image-photo/image-mock-trucker-hat-design-260nw-2524857745.jpg"
+                            alt="" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="seccion">
+                    <div class="seccion-1">
+                        <h3>Promoción 3</h3>
+                        <div class="precios">
+                            <p class="precio-1">$8.50</p>
+                            <p class="precio-2">$5.95</p>
+                        </div>
+                        <a href="#" class="agregar-carrito btn-3" data-id="3">Agregar al Carrito</a>
+                    </div>
+                    <div class="seccion-img">
+                        <img src="https://img.magnific.com/fotos-premium/taza-negra-mango-aislado-sobre-fondo-blanco-bebidas-calientes-cafe-te_1294819-16243.jpg?semt=ais_hybrid&w=740&q=80"
+                            alt="" loading="lazy">
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer class="footer container">
+
+            <div class="link">
+                <h3>Lorem</h3>
                 <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="/app/productos">Productos</a></li>
-                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
                 </ul>
-            </nav>
+            </div>
 
-            <div>
+            <div class="link">
+                <h3>Lorem</h3>
                 <ul>
-                    <li class="submenu">
-                        <i class="fa-solid fa-cart-shopping" id="logo-carrito"></i>
-                        <div id="carrito">
-                            <table id="lista-carrito">
-                                <thead>
-                                    <tr>
-                                        <th>Imagen</th>
-                                        <th>Nombre</th>
-                                        <th>Precio</th>
-                                        <!-- <th>Cantidad</th> -->
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                            <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
-                        </div>
-                    </li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
                 </ul>
             </div>
 
-        </div>
-
-        <div class="header-content container">
-
-            <div class="swiper mySwiper-1">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <div class="header-info">
-                            <div class="header-txt">
-                                <h1>Camisa Oficial SyPago</h1>
-                                <div class="precios">
-                                    <p class="precio-1">$15</p>
-                                </div>
-                                <a href="#" class="btn-1">Información</a>
-                            </div>
-                        </div>
-                        <div class="header-img">
-                            <img src="/static/img/Laptop Pro 15.png" alt="" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div c lass="header-info">
-                            <div class="header-txt">
-                                <h1>Monitor Gamer 27"</h1>
-                                <div class="precios">
-                                    <p class="precio-1">$220</p>
-                                </div>
-                                <a href="#" class="btn-1">Información</a>
-                            </div>
-                        </div>
-                        <div class="header-img">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUcqgSXqLjgYJVT4xb0mPxV88Ajm00aBC7CSfoTaMmqGVKbWivFrYMw1Y&s=10"
-                                alt="" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="header-info">
-                            <div class="header-txt">
-                                <h1>Teclado Mecánico RGB</h1>
-                                <div class="precios">
-                                    <p class="precio-1">$20.5</p>
-                                </div>
-                                <a href="#" class="btn-1">Información</a>
-                            </div>
-                        </div>
-                        <div class="header-img">
-                            <img src="https://soytechno.com/wp-content/uploads/2026/06/Redragon-Fizz-K617RGB-MP-Magnetic-Black-1.jpg"
-                                alt="" loading="lazy">
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination"></div>
+            <div class="link">
+                <h3>Lorem</h3>
+                <ul>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                    <li><a href="#">Lorem</a></li>
+                </ul>
             </div>
 
-        </div>
+        </footer>
 
-    </header>
-
-    <hr>
-
-    <section class="promociones container" id="lista-1">
-
-        <h2>Promociones</h2>
-
-        <div class="secciones"> <!--para no poner "categorias", que ira en el carrusel de productos -->
-
-            <div class="seccion">
-                <div class="seccion-1">
-                    <h3>Promoción 1</h3>
-                    <div class="precios">
-                        <p class="precio-1">$15.00</p>
-                        <p class="precio">$10.50</p>
-                    </div>
-                    <a href="#" class="agregar-carrito btn-3" data-id="1">Agregar al Carrito</a>
-                </div>
-                <div class="seccion-img">
-                    <img src="https://img.magnific.com/psd-premium/camisa-negra-logotipo-blanco-frente_1259581-7.jpg?semt=ais_hybrid&w=740&q=80"
-                        alt="" loading="lazy">
-                </div>
-            </div>
-
-            <div class="seccion">
-                <div class="seccion-1">
-                    <h3>Promoción 2</h3>
-                    <div class="precios">
-                        <p class="precio-1">$20.50</p>
-                        <p class="precio">$14.35</p>
-                    </div>
-                    <a href="#" class="agregar-carrito btn-3" data-id="2">Agregar al Carrito</a>
-                </div>
-                <div class="seccion-img">
-                    <img src="https://www.shutterstock.com/image-photo/image-mock-trucker-hat-design-260nw-2524857745.jpg"
-                        alt="" loading="lazy">
-                </div>
-            </div>
-
-            <div class="seccion">
-                <div class="seccion-1">
-                    <h3>Promoción 3</h3>
-                    <div class="precios">
-                        <p class="precio-1">$8.50</p>
-                        <p class="precio">$5.95</p>
-                    </div>
-                    <a href="#" class="agregar-carrito btn-3" data-id="3">Agregar al Carrito</a>
-                </div>
-                <div class="seccion-img">
-                    <img src="https://img.magnific.com/fotos-premium/taza-negra-mango-aislado-sobre-fondo-blanco-bebidas-calientes-cafe-te_1294819-16243.jpg?semt=ais_hybrid&w=740&q=80"
-                        alt="" loading="lazy">
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-    <footer class="footer container">
-
-        <div class="link">
-            <h3>Lorem</h3>
-            <ul>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Lorem</a></li>
-            </ul>
-        </div>
-
-        <div class="link">
-            <h3>Lorem</h3>
-            <ul>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Lorem</a></li>
-                <li><a href="#">Lorem</a></li>
-            </ul>
-        </div>
-
-        <div class="link">
-            <h3>Lorem</h3>
-            <p>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptate suscipit ab doloremque, dignissimos
-                sequi sed? Inventore deserunt cum quas illum. Blanditiis tempore explicabo quis architecto velit
-                distinctio nulla quisquam eligendi.
-            </p>
-        </div>
-
-    </footer>
-
-    <script src="/static/js/script.js"></script>
-</body>
+        <script src="/static/js/script.js"></script>
+    </body>
 
 </html>
