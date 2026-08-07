@@ -10,6 +10,6 @@ func Main() {
 	ruta := gin.Default()
 
 	routes.SetupRoutes(ruta)
-
+	TdC(ruta)
 	ruta.Run(":8080")
 }

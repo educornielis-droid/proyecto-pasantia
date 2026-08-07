@@ -19,3 +19,11 @@ func main() {
 
 	<-sigs
 }
+
+/*
+import "proyecto-golang/servidor"
+
+func main() {
+	servidor.TdC()
+}
+*/

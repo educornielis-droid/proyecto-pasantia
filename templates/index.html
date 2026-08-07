@@ -6,17 +6,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{.Title}}</title>
         <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"/>
         <link rel="stylesheet" href="./static/css/style.css">
     </head>
 
     <body>
-        <header class="header">
-            <div class="menu container">
+        <header class="header header-inicio">
+            <div class="menu container menu-inicio">
 
                 <a href="#" class="logo">Sypago Store</a>
                 <input type="checkbox" id="menu"/>
-                <label for="menu"><i class="fa-solid fa-bars" id="menu-icono"></i>
-                </label>
+                <label for="menu"><i class="fa-solid fa-bars" id="menu-icono"></i></label>
 
                 <nav class="navbar">
                     <ul>
@@ -37,13 +37,28 @@
                                             <th>Imagen</th>
                                             <th>Nombre</th>
                                             <th>Precio</th>
-                                            <!-- <th>Cantidad</th> -->
+                                            <th>Cantidad</th>
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                        </tbody>
                                 </table>
-                                <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+
+                                <p id="carrito-vacio-msg">
+                                    El carrito está vacío
+                                </p>
+
+                                <div id="carrito-acciones">
+                                    <div class="total-carrito">
+                                        <span>Total:</span>
+                                        <span id="total-monto">$0.00</span>
+                                    </div>
+                                    <div class="botones-carrito">
+                                        <a href="#" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+                                        <a href="#" id="pagar-carrito" class="btn-3">Pagar</a>
+                                    </div>
+                                </div>
                             </div>
                         </li>
                     </ul>
@@ -64,13 +79,13 @@
                                     </div>
                                     <a href="#" class="btn-1">Información</a>
                                 </div>
-                            </div>
-                            <div class="header-img">
-                                <img src="/static/img/Laptop Pro 15.png" alt="" loading="lazy">
+                                <div class="header-img">
+                                    <img src="/static/img/Laptop Pro 15.png" alt="" loading="lazy">
+                                </div>
                             </div>
                         </div>
                         <div class="swiper-slide">
-                            <div c lass="header-info">
+                            <div class="header-info">
                                 <div class="header-txt">
                                     <h1>Monitor Gamer 27"</h1>
                                     <div class="precios">
@@ -78,10 +93,9 @@
                                     </div>
                                     <a href="#" class="btn-1">Información</a>
                                 </div>
-                            </div>
-                            <div class="header-img">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUcqgSXqLjgYJVT4xb0mPxV88Ajm00aBC7CSfoTaMmqGVKbWivFrYMw1Y&s=10"
-                                    alt="" loading="lazy">
+                                <div class="header-img">
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUcqgSXqLjgYJVT4xb0mPxV88Ajm00aBC7CSfoTaMmqGVKbWivFrYMw1Y&s=10" alt="" loading="lazy">
+                                </div>
                             </div>
                         </div>
                         <div class="swiper-slide">
@@ -93,10 +107,9 @@
                                     </div>
                                     <a href="#" class="btn-1">Información</a>
                                 </div>
-                            </div>
-                            <div class="header-img">
-                                <img src="https://soytechno.com/wp-content/uploads/2026/06/Redragon-Fizz-K617RGB-MP-Magnetic-Black-1.jpg"
-                                    alt="" loading="lazy">
+                                <div class="header-img">
+                                    <img src="https://soytechno.com/wp-content/uploads/2026/06/Redragon-Fizz-K617RGB-MP-Magnetic-Black-1.jpg" alt="" loading="lazy">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,7 +209,7 @@
             </div>
 
         </footer>
-
+        <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
         <script src="/static/js/script.js"></script>
     </body>
 

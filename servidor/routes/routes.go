@@ -70,7 +70,7 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	})
 
-	ruta.GET("/api/v1/productos", func(contexto *gin.Context) {
+	ruta.GET("/api/productos", func(contexto *gin.Context) {
 		productos, err := database.ObtenerProductos()
 		if err != nil {
 			contexto.JSON(http.StatusInternalServerError, gin.H{

@@ -36,13 +36,28 @@
                                             <th>Imagen</th>
                                             <th>Nombre</th>
                                             <th>Precio</th>
-                                            <!-- <th>Cantidad</th> -->
+                                            <th>Cantidad</th>
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                        </tbody>
                                 </table>
-                                <a href="" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+
+                                <p id="carrito-vacio-msg">
+                                    El carrito está vacío
+                                </p>
+
+                                <div id="carrito-acciones">
+                                    <div class="total-carrito">
+                                        <span>Total:</span>
+                                        <span id="total-monto">$0.00</span>
+                                    </div>
+                                    <div class="botones-carrito">
+                                        <a href="#" id="vaciar-carrito" class="btn-3">Vaciar Carrito</a>
+                                        <a href="#" id="pagar-carrito" class="btn-3">Pagar</a>
+                                    </div>
+                                </div>
                             </div>
                         </li>
                     </ul>
@@ -123,6 +138,6 @@
             </div>
 
         </footer>
-
+        <script src="/static/js/script.js"></script>
     </body>
 </html>

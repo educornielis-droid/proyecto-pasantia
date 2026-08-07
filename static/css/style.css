@@ -115,6 +115,101 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+#carrito-vacio-msg {
+    text-align: center; 
+    color: #fff; 
+    padding: 10px 0; 
+    margin: 0;
+}
+
+#carrito-acciones {
+    display: none; 
+    margin-top: 15px; 
+    border-top: 1px solid rgba(255,255,255,0.2); 
+    padding-top: 10px;
+}
+
+.total-carrito {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    color: #FEFFFF; 
+    font-weight: bold; 
+    margin: 10px 0;
+}
+
+.botones-carrito {
+    display: flex; 
+    gap: 10px; 
+    justify-content: space-between;
+}
+
+#vaciar-carrito {
+    background-color: #e74c3c; 
+    padding: 8px 12px; 
+    color: #FEFFFF; 
+    text-decoration: none; 
+    border-radius: 4px; 
+    font-size: 14px;
+}
+
+#pagar-carrito {
+    background-color: #2ecc71; 
+    padding: 8px 12px; 
+    color: #FEFFFF; 
+    text-decoration: none; 
+    border-radius: 4px; 
+    font-size: 14px;
+}
+
+#lista-carrito {
+    width: 100%;
+    border-collapse: collapse;
+    color: #ffffff;
+}
+
+#lista-carrito th {
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    text-align: left;
+}
+
+#lista-carrito td {
+    padding: 8px 4px;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+#lista-carrito img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.input-cantidad {
+    width: 50px;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    text-align: center;
+    background-color: #ffffff;
+    color: #181818;
+}
+
+.borrar-producto {      /* de manera individual */
+    color: #e74c3c;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.borrar-producto:hover {
+    color: #ff6b6b;
+}
+
 table {
     width: 100%;
 }
@@ -133,7 +228,7 @@ th, td {
 }
 
 .header-content {
-    padding: 200px 0 100px 0;
+    padding: 150px 0 100px 0;
 }
 
 .header-info {
@@ -245,7 +340,8 @@ hr {
     width: 50%;
 }
 
-.header-productos {
+.header-productos,
+.header-inicio {
     min-height: auto !important;
     padding-bottom: 20px !important;
 }
@@ -323,4 +419,211 @@ hr {
 .link p {
     color: #747B8F;
     font-size: 16px;
+}
+
+
+
+/* seccion del responsive */
+
+@media (max-width: 991px) {
+    
+    .header-inicio {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; 
+        min-height: auto;           
+        position: relative;
+    }
+
+    .menu-inicio {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; 
+        position: relative;
+        z-index: 1000;                  
+    }
+
+    .header-inicio .header-content {
+        margin-top: 20px;              
+        width: 100%;
+    }
+
+    .menu {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
+        width: 100%;
+        position: relative; 
+    }
+
+    .menu label #menu-icono {
+        display: block; 
+        cursor: pointer;
+    }
+
+    .menu .navbar {
+        position: absolute;
+        top: 100%;       
+        left: 0;
+        width: 100%;    
+        background-color: #181818; 
+        display: none;   
+        z-index: 1000;  
+    }
+
+    .menu .navbar ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu .navbar ul li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .menu .navbar ul li a {
+        display: block;
+        padding: 15px;
+        color: #ffffff;
+    }
+
+    #menu:checked ~ .navbar {
+        display: block;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .submenu:hover #carrito {
+        min-width: 100%;
+    }
+
+    .header-content {
+        padding: 1px 0 10px 0;
+    }
+
+    .mySwiper-1 {
+        width: 100%;
+        max-width: 350px; /* Se adapta a pantallas más pequeñas sin romperse */
+        margin: 0 auto;   /* Centra el slider completo horizontalmente */
+    }
+
+    .swiper-slide {
+        padding: 10px 20px 40px 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .header-info {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;    /* Centra horizontalmente todo el contenido */
+        justify-content: center;
+        text-align: center;     /* Centra todo el texto */
+        width: 100%;
+    }
+
+    .header-txt {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header-txt h1 {
+        font-size: 28px; /* Tamaño adaptado a pantallas móviles */
+        margin-bottom: 10px;
+    }
+
+    .precios {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .precio {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .precio-1,
+    .precio-2 {
+        margin: 0;
+    }
+
+    .btn-1 {
+        margin: 15px 0 20px 0;
+        display: inline-block;
+    }
+
+    .header-img {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .header-img img {
+        width: 180px;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+    .promociones {
+        padding: 30px;
+    }
+
+    .promociones h2 {
+        font-size: 40px;
+        margin-bottom: 0;
+    }
+
+    .secciones {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .seccion {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .seccion-1 {
+        width: 100%;
+        margin-bottom: 25px;
+        order: -1;
+    }
+
+    .seccion-img {
+        width: 100%;
+    }
+
+    .productos {
+        padding: 30px;
+    }
+
+    .productos h2 {
+        font-size: 40px;
+        margin-bottom: 40px;
+    }
+
+    .footer {
+        flex-direction: column;
+        align-items: baseline;
+        text-align: center;
+    }
+
+    .link {
+        width: 100%;
+        margin-left: 0;
+    }
+
 }
