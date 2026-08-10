@@ -2,7 +2,6 @@ package servidor
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -113,68 +112,68 @@ type SypagoPaylinkPayResponse struct { //Respuesta que entrega la API de SyPago
 	OperationSecret string `json:"operation_secret"`
 }
 
-func CheckOut(ruta *gin.Engine) {
+// func CheckOut(ruta *gin.Engine) {
 
-	ruta.POST("/api/checkout", func(contexto *gin.Context) {
+// 	ruta.POST("/api/checkout", func(contexto *gin.Context) {
 
-		var solicitudFront CheckoutFrontRequest
+// 		var solicitudFront CheckoutFrontRequest
 
-		if err := contexto.ShouldBindJSON(&solicitudFront); err != nil {
-			contexto.JSON(http.StatusBadRequest, gin.H{
-				"error": "datos enviados por el usuario desde el front invalidos",
-			})
-			return
-		}
+// 		if err := contexto.ShouldBindJSON(&solicitudFront); err != nil {
+// 			contexto.JSON(http.StatusBadRequest, gin.H{
+// 				"error": "datos enviados por el usuario desde el front invalidos",
+// 			})
+// 			return
+// 		}
 
-		payloadSypago := SypagoPaylinkPayload{
-			InternalID: fmt.Sprintf("%d", time.Now().UnixNano())[:12],
-			GroupID:    "0326AB3008E8",
-			Account: AccountInfo{
-				BankCode: "0001",
-				Type:     "CNTA",
-				Number:   "00010174520100126130",
-			},
-			Amount: AmountInfo{
-				Type:        "ALMM",
-				Amt:         solicitudFront.Monto,
-				Currency:    "VES",
-				MinAllowAmt: 1,
-				MaxAllowAmt: solicitudFront.Monto,
-				UseDayRate:  false,
-			},
-			Concept: solicitudFront.Concepto,
-			NotificationURLs: NotificationURLs{
-				SuccessfulCallbackURL: "https://www.sypago.net/success",
-				FailedCallbackURL:     "https://www.sypago.net/fail",
-				ReturnFrontEndURL:     "https://www.sypago.net/return",
-				WebHookEndpoint:       "https://www.sypago.net/notification",
-			},
-			ReceivingUser: ReceivingUser{
-				Name: solicitudFront.NombreCliente,
-				DocumentInfo: DocumentInfo{
-					Type:   solicitudFront.TipoDocumento,
-					Number: solicitudFront.NumeroDocumento,
-				},
-				Account: AccountInfo{
-					BankCode: "0102",
-					Type:     "CELE",
-					Number:   "04140121877",
-				},
-			},
-			Expiration: 300,
-		}
+// 		payloadSypago := SypagoPaylinkPayload{
+// 			InternalID: fmt.Sprintf("%d", time.Now().UnixNano())[:12],
+// 			GroupID:    "0326AB3008E8",
+// 			Account: AccountInfo{
+// 				BankCode: "0001",
+// 				Type:     "CNTA",
+// 				Number:   "00010174520100126130",
+// 			},
+// 			Amount: AmountInfo{
+// 				Type:        "ALMM",
+// 				Amt:         solicitudFront.Monto,
+// 				Currency:    "VES",
+// 				MinAllowAmt: 1,
+// 				MaxAllowAmt: solicitudFront.Monto,
+// 				UseDayRate:  false,
+// 			},
+// 			Concept: solicitudFront.Concepto,
+// 			NotificationURLs: NotificationURLs{
+// 				SuccessfulCallbackURL: "https://www.sypago.net/success",
+// 				FailedCallbackURL:     "https://www.sypago.net/fail",
+// 				ReturnFrontEndURL:     "https://www.sypago.net/return",
+// 				WebHookEndpoint:       "https://www.sypago.net/notification",
+// 			},
+// 			ReceivingUser: ReceivingUser{
+// 				Name: solicitudFront.NombreCliente,
+// 				DocumentInfo: DocumentInfo{
+// 					Type:   solicitudFront.TipoDocumento,
+// 					Number: solicitudFront.NumeroDocumento,
+// 				},
+// 				Account: AccountInfo{
+// 					BankCode: "0102",
+// 					Type:     "CELE",
+// 					Number:   "04140121877",
+// 				},
+// 			},
+// 			Expiration: 300,
+// 		}
 
-		bodyBytes, err := json.Marshal(payloadSypago)
+// 		bodyBytes, err := json.Marshal(payloadSypago)
 
-		if err != nil {
-			contexto.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Error al procesar la peticion interna",
-			})
-			return
-		}
+// 		if err != nil {
+// 			contexto.JSON(http.StatusInternalServerError, gin.H{
+// 				"error": "Error al procesar la peticion interna",
+// 			})
+// 			return
+// 		}
 
-		url := "https://pruebas.api.sypago.net/api/v1/transaction/paylink"
+// 		url := "https://pruebas.api.sypago.net/api/v1/transaction/paylink"
 
-	})
+// 	})
 
-}
+// }

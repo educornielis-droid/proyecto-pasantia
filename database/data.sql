@@ -166,3 +166,9 @@ INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock) VALUES
 (3, 'Webcam 2K con Aro de Luz', 'Cámara HD con iluminación regulable integrada para videollamadas.', 48.00, 18),
 (4, 'Amplificador de Auriculares DAC USB', 'Convertidor de audio portátil para alta fidelidad de sonido.', 50.00, 10),
 (6, 'Funda Protectora para Laptop 15.6"', 'Estuche acolchado e impermeable con bolsillo frontal para accesorios.', 18.00, 40);
+
+
+
+UPDATE productos 
+SET imagen_url = '/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png'
+WHERE producto_id = 1;

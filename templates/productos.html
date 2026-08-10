@@ -78,7 +78,7 @@
                     {{ range .Productos }}
                     <div class="swiper-slide">
                         <div class="producto">
-                            <img src="" alt="{{ .Nombre }}" loading="lazy">
+                            <img src="{{ .ImagenURL }}" alt="{{ .Nombre }}" loading="lazy">
                             <div class="producto-txt">
                                 <h3>{{ .Nombre }}</h3>
                                 <p>{{ .Descripcion }}</p>
@@ -86,7 +86,8 @@
                                 <p class="precio">${{ printf "%.2f" .Precio }}</p>
                                 <a href="#" class="agregar-carrito btn-3" 
                                 data-nombre="{{ .Nombre }}" 
-                                data-precio="{{ .Precio }}">
+                                data-precio="{{ .Precio }}"
+                                data-imagen="{{ .ImagenURL }}">
                                 Agregar al Carrito
                                 </a>
                             </div>
@@ -138,6 +139,6 @@
             </div>
 
         </footer>
-        <script src="/static/js/script.js"></script>
+        <script src="/static/js/carrito.js"></script>
     </body>
 </html>

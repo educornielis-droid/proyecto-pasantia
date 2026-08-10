@@ -11,5 +11,3 @@ var swiper = new Swiper(".mySwiper-1", {
         prevEl: ".swiper-button-prev"
     }
 })
-
-
