@@ -15,7 +15,7 @@ type Productos struct {
 	NombreCategoria string  `json:"nombre_categoria"`
 	Precio          float64 `json:"precio"`
 	Stock           int     `json:"stock"`
-	ImagenURL 		string 	`json:"imagen_url"`
+	ImagenURL       string  `json:"imagen_url"`
 }
 
 // Variable global del paquete github.com/jackc/pgx/v5 para reutilizar la conexión
@@ -74,4 +74,23 @@ func ObtenerProductos() ([]Productos, error) {
 	}
 
 	return listaProductos, nil
+}
+
+// 4. Función que consulta UN SOLO producto por nombre.
+// La usa checkout.go para recalcular precio/stock/imagen de forma segura,
+// sin confiar en lo que mande el navegador.
+func ObtenerProductoPorNombre(nombre string) (Productos, error) {
+	var p Productos
+
+	err := DB.QueryRow(
+		context.Background(),
+		"SELECT nombre, descripcion, nombre_categoria, precio, stock, COALESCE(imagen_url, '') FROM v_productos WHERE nombre = $1",
+		nombre,
+	).Scan(&p.Nombre, &p.Descripcion, &p.NombreCategoria, &p.Precio, &p.Stock, &p.ImagenURL)
+
+	if err != nil {
+		return Productos{}, fmt.Errorf("producto no encontrado: %w", err)
+	}
+
+	return p, nil
 }

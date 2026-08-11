@@ -6,11 +6,15 @@ import (
 	"proyecto-golang/database"
 	"proyecto-golang/servidor"
 	"syscall"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	godotenv.Load()
 
 	go servidor.Main()
 

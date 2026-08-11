@@ -172,3 +172,7 @@ INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock) VALUES
 UPDATE productos 
 SET imagen_url = '/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png'
 WHERE producto_id = 1;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png'
+WHERE producto_id = 2;

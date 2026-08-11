@@ -56,6 +56,12 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	})
 
+	ruta.GET("/app/login", func(contexto *gin.Context) {
+		contexto.HTML(http.StatusOK, "login.html", gin.H{
+			"Titulo": "Login",
+		})
+	})
+
 	ruta.GET("/api/v1", func(contexto *gin.Context) {
 		productos, err := database.ObtenerProductos()
 		if err != nil {

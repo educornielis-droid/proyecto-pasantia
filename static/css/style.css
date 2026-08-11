@@ -81,7 +81,8 @@ body {
 }
 
 #menu-icono,
-#logo-carrito {
+#logo-carrito,
+#logo-usuario {
     color: #FEFFFF;
     border: none;
     font-size: 30px;
@@ -367,6 +368,7 @@ hr {
 .producto img {
     width: 150px;
     margin-bottom: 15px;
+    border-radius: 13px;
 }
 
 .producto-txt h3 {
@@ -421,6 +423,52 @@ hr {
 .link p {
     color: #747B8F;
     font-size: 16px;
+}
+
+.body-login {
+    background-color: #e2e2e2;
+    background: linear-gradient(to bottom right, rgb(158, 190, 219), #e2e2e2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.containerLogin {
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-width: 480px;
+}
+
+.containerLogin p {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.3px;
+    margin: 20px 0;
+}
+
+.containerLogin span {
+    font-size: 12px;
+}
+
+.containerLogin button {
+    background-color: rgb(0, 101, 187);
+    color: white;
+    font-size: 12px;
+    padding: 10px 45px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
 

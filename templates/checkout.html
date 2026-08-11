@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ .Title }}</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="/static/css/checkout.css">
+    </head>
+    <body class="checkout-body">
+
+        <div class="checkout-contenedor">
+
+            <!-- PANEL IZQUIERDO: resumen de la compra, viene 100% del backend -->
+            <div class="checkout-panel-izquierdo">
+                <div class="checkout-marca-comercio">{{ .NombreComercio }}</div>
+                <div class="checkout-rif">{{ .Rif }}</div>
+
+                <div class="checkout-resumen-titulo">Resumen de tu compra</div>
+
+                <div class="checkout-lista-productos">
+                    {{ range .Productos }}
+                    <div class="checkout-producto-item">
+                        <img src="{{ .ImagenURL }}" alt="{{ .Nombre }}">
+                        <div class="checkout-producto-info">
+                            <p class="checkout-producto-nombre">{{ .Nombre }}</p>
+                            <p class="checkout-producto-cantidad">Cantidad: {{ .Cantidad }}</p>
+                        </div>
+                        <p class="checkout-producto-precio">${{ printf "%.2f" .Subtotal }}</p>
+                    </div>
+                    {{ else }}
+                    <p>No hay productos en esta transacción.</p>
+                    {{ end }}
+                </div>
+
+                <div class="checkout-total-card">
+                    <span>Total a Pagar:</span>
+                    <span class="checkout-total-monto" id="checkout-total-monto">${{ printf "%.2f" .Total }}</span>
+                </div>
+
+                <div class="checkout-footer-izquierdo">
+                    <a href="#">Términos y Condiciones</a>
+                    <a href="#">Ayuda</a>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO: formulario real -->
+            <div class="checkout-panel-derecho">
+                <div class="checkout-logo-sypago">sy<span>pago</span></div>
+
+                <form id="formulario-pago-otp">
+
+                    <div class="checkout-campo">
+                        <label for="campo-banco">Banco</label>
+                        <select id="campo-banco" required>
+                            <option value="">Selecciona tu banco</option>
+                            <option value="0102">Banco de Venezuela (0102)</option>
+                            <option value="0104">Banco Venezolano de Crédito (0104)</option>
+                            <option value="0105">Banco Mercantil (0105)</option>
+                            <option value="0108">BBVA Provincial (0108)</option>
+                            <option value="0114">Bancaribe (0114)</option>
+                            <option value="0115">Banco Exterior (0115)</option>
+                            <option value="0116">Banco Occidental de Descuento (0116)</option>
+                            <option value="0128">Banco Caroní (0128)</option>
+                            <option value="0134">Banesco (0134)</option>
+                            <option value="0137">Banco Sofitasa (0137)</option>
+                            <option value="0138">Banco Plaza (0138)</option>
+                            <option value="0146">Banco de la Gente Emprendedora (0146)</option>
+                            <option value="0151">Banco Fondo Común (0151)</option>
+                            <option value="0156">100% Banco (0156)</option>
+                            <option value="0157">DelSur (0157)</option>
+                            <option value="0163">Banco del Tesoro (0163)</option>
+                            <option value="0166">Banco Agrícola de Venezuela (0166)</option>
+                            <option value="0168">Bancrecer (0168)</option>
+                            <option value="0169">Mi Banco (0169)</option>
+                            <option value="0171">Banco Activo (0171)</option>
+                            <option value="0172">Bancamiga (0172)</option>
+                            <option value="0174">Banplus (0174)</option>
+                            <option value="0175">Banco Bicentenario (0175)</option>
+                            <option value="0177">Banco de la Fuerza Armada (0177)</option>
+                            <option value="0190">Banco Nacional de Crédito (0190)</option>
+                            <option value="0191">Banco Nacional de Crédito BNC (0191)</option>
+                        </select>
+                        <p class="checkout-nota-campo">
+                            Verifica esta lista de códigos contra la documentación oficial de Sypago antes de producción.
+                        </p>
+                    </div>
+
+                    <div class="checkout-tabs-metodo" id="tabs-tipo-cuenta">
+                        <div class="checkout-tab-btn activo" data-tipo="CELE">Teléfono</div>
+                        <div class="checkout-tab-btn" data-tipo="CNTA">Cuenta</div>
+                    </div>
+                    <input type="hidden" id="campo-tipo-cuenta" value="CELE">
+
+                    <div class="checkout-campo">
+                        <label for="campo-numero-cuenta" id="etiqueta-numero-cuenta">Teléfono</label>
+                        <input type="text" id="campo-numero-cuenta" placeholder="04141234567" required>
+                    </div>
+
+                    <div class="checkout-campo checkout-doc-fila">
+                        <div>
+                            <label for="campo-tipo-documento">Doc</label>
+                            <select id="campo-tipo-documento" required>
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                                <option value="J">J</option>
+                                <option value="G">G</option>
+                            </select>
+                        </div>
+                        <div style="flex:1">
+                            <label for="campo-numero-documento">&nbsp;</label>
+                            <input type="text" id="campo-numero-documento" placeholder="Número de Documento" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="checkout-btn-pagar" id="checkout-boton-pagar">Pagar</button>
+                    <p class="checkout-mensaje-error" id="checkout-mensaje-error"></p>
+                </form>
+
+                <!-- Bloque OTP, oculto hasta que se solicite el código exitosamente -->
+                <div class="checkout-bloque-otp" id="checkout-bloque-otp" style="display:none;">
+                    <p class="checkout-otp-instrucciones">
+                        Ingrese la clave de pago enviada por SMS, correo electrónico o notificación en su App Bancaria.
+                    </p>
+                    <div class="checkout-otp-casillas" id="checkout-otp-casillas">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                        <input type="text" maxlength="1" inputmode="numeric">
+                    </div>
+                    <button type="button" class="checkout-btn-pagar" id="checkout-boton-confirmar-otp" disabled>
+                        Confirmar (pendiente de implementar)
+                    </button>
+                    <p class="checkout-otp-contador" id="checkout-otp-contador"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Overlay del modal de confirmación, se llena dinámicamente desde JS -->
+        <div class="checkout-overlay-modal" id="checkout-overlay-confirmacion" style="display:none;">
+            <div class="checkout-tarjeta-modal">
+                <h3>Confirmar compra</h3>
+                <p id="checkout-modal-texto-monto"></p>
+                <div class="checkout-modal-botones">
+                    <button type="button" id="checkout-boton-cancelar-modal" class="checkout-modal-btn-secundario">Cancelar</button>
+                    <button type="button" id="checkout-boton-confirmar-modal" class="checkout-modal-btn-primario">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="id-transaccion" value="{{ .IDTransaccion }}">
+
+        <script src="/static/js/checkout.js"></script>
+    </body>
+</html>
