@@ -26,7 +26,8 @@ func SetupRoutes(ruta *gin.Engine) {
 		// endpoint separado por segmentos
 		if len(segments) < 1 {
 			contexto.HTML(http.StatusOK, "index.html", gin.H{
-				"Title": "SyPago Store",
+				"Title": "Inicio - Sypago Store",
+				"Logo":  "/static/img/sypago_spinner.svg",
 			})
 		} else if segments[0] == "productos" {
 
@@ -50,15 +51,17 @@ func SetupRoutes(ruta *gin.Engine) {
 		}
 
 		contexto.HTML(http.StatusOK, "productos.html", gin.H{
-			"Title":     "Productos",
+			"Title":     "Productos - Sypago Store",
 			"Productos": productos,
+			"Logo":      "/static/img/sypago_spinner.svg",
 		})
 
 	})
 
 	ruta.GET("/app/login", func(contexto *gin.Context) {
 		contexto.HTML(http.StatusOK, "login.html", gin.H{
-			"Titulo": "Login",
+			"Titulo": "Login - Sypago Store",
+			"Logo":   "/static/img/sypago_spinner.svg",
 		})
 	})
 

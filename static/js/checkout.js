@@ -1,7 +1,3 @@
-/* ============================================================
-   CHECKOUT.HTML - Lógica del formulario de pago y solicitud OTP
-   ============================================================ */
-
 console.log("[Checkout] checkout.js se cargó correctamente.");
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -90,11 +86,20 @@ function inicializarCheckout() {
             }
         });
     });
+
+    const botonConfirmarOtp = document.getElementById("checkout-boton-confirmar-otp");
+    if (botonConfirmarOtp) {
+        botonConfirmarOtp.addEventListener("click", confirmarCodigoOtp);
+    }
+
+    const botonReenviarOtp = document.getElementById("checkout-boton-reenviar-otp");
+    if (botonReenviarOtp) {
+        botonReenviarOtp.addEventListener("click", reenviarCodigoOtp);
+    }
 }
 
 /* ------------------------------------------------------------
-   VALIDACIÓN BÁSICA DEL FORMULARIO (del lado del cliente,
-   el backend igual debe validar todo de nuevo)
+   VALIDACIÓN BÁSICA DEL FORMULARIO para pagar
 ------------------------------------------------------------- */
 function validarFormularioPago() {
     const banco = document.getElementById("campo-banco").value;
@@ -130,7 +135,9 @@ function validarFormularioPago() {
 }
 
 function mostrarErrorFormulario(mensaje) {
-    const elementoError = document.getElementById("checkout-mensaje-error");
+    const bloqueOtpVisible = document.getElementById("checkout-bloque-otp").style.display === "block";
+    const idElementoError = bloqueOtpVisible ? "checkout-otp-mensaje-error" : "checkout-mensaje-error";
+    const elementoError = document.getElementById(idElementoError);
     if (elementoError) {
         elementoError.textContent = mensaje;
     }
@@ -207,16 +214,135 @@ function mostrarBloqueOtp() {
         primeraCasilla.focus();
     }
 
-    iniciarContadorReenvio(300); // 300 segundos, igual que el "expiration" que Sypago maneja
+    iniciarContadorReenvio(300); // 300 segundos, igual q Sypago 
+}
+
+/* ------------------------------------------------------------
+   CONFIRMAR EL CÓDIGO OTP QUE EL USUARIO ESCRIBIÓ
+------------------------------------------------------------- */
+let intervaloPolling = null;
+let intentosPolling = 0;
+const MAXIMO_INTENTOS_POLLING = 60; // 60 x 2.5s = 150 segundos como techo (2minutos, 30s)
+
+async function confirmarCodigoOtp() {
+    const idTransaccion = document.getElementById("id-transaccion").value;
+    const botonConfirmar = document.getElementById("checkout-boton-confirmar-otp");
+    const elementoErrorOtp = document.getElementById("checkout-otp-mensaje-error");
+
+    const casillasOtp = document.querySelectorAll("#checkout-otp-casillas input");
+    const codigoOtp = Array.from(casillasOtp).map(function (casilla) {
+        return casilla.value;
+    }).join("");
+
+    if (codigoOtp.length !== casillasOtp.length) {
+        elementoErrorOtp.textContent = "Completa las " + casillasOtp.length + " casillas del código.";
+        return;
+    }
+
+    elementoErrorOtp.textContent = "";
+    botonConfirmar.disabled = true;
+    botonConfirmar.textContent = "Enviando...";
+
+    try {
+        const respuesta = await fetch("/api/checkout/" + idTransaccion + "/confirmar-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ otp: codigoOtp })
+        });
+
+        if (!respuesta.ok) {
+            const detalleError = await respuesta.json().catch(function () { return {}; });
+            throw new Error(detalleError.error || "No se pudo enviar la solicitud de pago.");
+        }
+
+        // OJO: esto NO es éxito todavía. Solo significa que Sypago aceptó
+        // procesar la solicitud. El resultado real llega por polling.
+        console.log("[Checkout] Solicitud de pago enviada, iniciando verificación de estado...");
+        mostrarBloqueProcesando();
+        intentosPolling = 0;
+        intervaloPolling = setInterval(function () {
+            consultarEstadoTransaccion(idTransaccion);
+        }, 2500);
+    } catch (error) {
+        console.error("[Checkout] Error al enviar la solicitud de pago:", error);
+        elementoErrorOtp.textContent = error.message;
+        botonConfirmar.disabled = false;
+        botonConfirmar.textContent = "Confirmar";
+    }
+}
+
+function mostrarBloqueProcesando() {
+    document.getElementById("checkout-bloque-otp").style.display = "none";
+    document.getElementById("checkout-bloque-procesando").style.display = "block";
+}
+
+/* ------------------------------------------------------------
+   POLLING: consulta el estado real cada 2.5 segundos hasta obtener un estado definitivo (ACCP, RJCT o CANC).
+------------------------------------------------------------- */
+async function consultarEstadoTransaccion(idTransaccion) {
+    intentosPolling++;
+
+    if (intentosPolling > MAXIMO_INTENTOS_POLLING) {
+        detenerPolling();
+        mostrarResultadoFinal("rechazo", "Esto está tardando más de lo esperado", "No pudimos confirmar tu pago a tiempo. Si el banco te descontó el monto, contáctanos con tu número de referencia.");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch("/api/checkout/" + idTransaccion + "/estado");
+
+        if (!respuesta.ok) {
+            const detalleError = await respuesta.json().catch(function () { return {}; });
+            console.error("[Checkout] Error al consultar estado:", detalleError.error);
+            return; // seguimos intentando en el próximo tick, no cortamos el polling por un error puntual
+        }
+
+        const datosEstado = await respuesta.json();
+        console.log("[Checkout] Estado actual:", datosEstado.estado, datosEstado);
+
+        if (datosEstado.estado === "ACCP") {
+            detenerPolling();
+            sessionStorage.removeItem("carritoSypago"); // limpiamos el carrito, la compra fue exitosa
+            mostrarResultadoFinal("exito", "¡Pago confirmado!", "Tu compra fue procesada correctamente. Referencia: " + datosEstado.transaction_id);
+        } else if (datosEstado.estado === "RJCT" || datosEstado.estado === "CANC") {
+            detenerPolling();
+            const motivo = datosEstado.descripcion || "El banco rechazó la operación.";
+            console.error("[Checkout] Pago rechazado. Código:", datosEstado.codigo_rechazo, "-", motivo);
+            mostrarResultadoFinal("rechazo", "No se pudo procesar tu pago", motivo);
+        }
+        // Si sigue en PEND o PROC, no hacemos nada: seguimos esperando el próximo tick.
+    } catch (error) {
+        console.error("[Checkout] Error de red al consultar estado:", error);
+        // no detenemos el polling por un error de red puntual
+    }
+}
+
+function detenerPolling() {
+    if (intervaloPolling) {
+        clearInterval(intervaloPolling);
+        intervaloPolling = null;
+    }
+}
+
+function mostrarResultadoFinal(tipo, titulo, mensaje) {
+    document.getElementById("checkout-bloque-procesando").style.display = "none";
+
+    const bloqueResultado = document.getElementById("checkout-bloque-resultado");
+    bloqueResultado.className = "checkout-bloque-resultado " + tipo;
+    bloqueResultado.innerHTML = "<h2>" + titulo + "</h2><p>" + mensaje + "</p>";
+    bloqueResultado.style.display = "block";
 }
 
 function iniciarContadorReenvio(segundosIniciales) {
     let segundosRestantes = segundosIniciales;
     const elementoContador = document.getElementById("checkout-otp-contador");
+    const botonReenviarOtp = document.getElementById("checkout-boton-reenviar-otp");
 
     if (temporizadorReenvioOtp) {
         clearInterval(temporizadorReenvioOtp);
     }
+
+    botonReenviarOtp.style.display = "none";
 
     function actualizarTexto() {
         elementoContador.textContent = "Espere antes de solicitar " + segundosRestantes + " seg";
@@ -228,9 +354,35 @@ function iniciarContadorReenvio(segundosIniciales) {
         segundosRestantes--;
         if (segundosRestantes <= 0) {
             clearInterval(temporizadorReenvioOtp);
-            elementoContador.textContent = "Ya puedes solicitar un nuevo código.";
+            elementoContador.textContent = "";
+            botonReenviarOtp.style.display = "block";
             return;
         }
         actualizarTexto();
     }, 1000);
+}
+
+/* ------------------------------------------------------------
+   REENVIAR CÓDIGO: reutiliza los mismos datos del formulario  y vuelve
+   a pedir un OTP nuevo al backend.
+------------------------------------------------------------- */
+async function reenviarCodigoOtp() {
+    const botonReenviarOtp = document.getElementById("checkout-boton-reenviar-otp");
+    const elementoErrorOtp = document.getElementById("checkout-otp-mensaje-error");
+
+    botonReenviarOtp.disabled = true;
+    botonReenviarOtp.textContent = "Solicitando...";
+    elementoErrorOtp.textContent = "";
+
+    // Limpiamos las casillas para que el usuario no confunda el código viejo con el nuevo
+    document.querySelectorAll("#checkout-otp-casillas input").forEach(function (casilla) {
+        casilla.value = "";
+    });
+
+    try {
+        await solicitarCodigoOtp(); // ya arma el request y, si sale bien, reinicia el contador
+    } finally {
+        botonReenviarOtp.disabled = false;
+        botonReenviarOtp.textContent = "Solicitar nuevo código";
+    }
 }

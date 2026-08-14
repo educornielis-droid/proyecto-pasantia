@@ -9,7 +9,8 @@
 }
 
 body {
-    background-color: #242430;
+    background-color: #e2e2e2;
+    background: linear-gradient(to bottom right, rgb(158, 190, 219), #e2e2e2);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -29,16 +30,19 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: white;
+    border-radius: 30px;
 }
 
 .swiper-button-prev::after, 
 .swiper-button-next::after {
-    font-size: 25px;
+    font-size: 70px;
 }
 
 .swiper-button-prev,
 .swiper-button-next {
-    color: #FEFFFF;
+    color: rgb(0, 101, 187);
+    font-size: 70px;
 }
 
 .swiper-pagination-bullet {
@@ -47,23 +51,30 @@ body {
 }
 
 .swiper-pagination-bullet-active {
-    background-color: #7270EC;
+    background-color: rgb(102, 176, 245);
 }
 
 .menu {
-    position: absolute;
-    top: 0;
+    position: fixed;
+    top: 10px;
     left: 0;
     right: 0;
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 3px 30px;
     z-index: 1000;
+    background-color: rgb(0, 100, 185);
+    background: linear-gradient(to right, rgb(0, 65, 125), rgb(0, 110, 210));
+    border-radius: 30px;
 }
 
 .logo {
     font-size: 25px;
-    color: #7270EC;
+    color: white;
     text-transform: uppercase;
     font-weight: 800;
 }
@@ -231,7 +242,8 @@ th, td {
 }
 
 .header-content {
-    padding: 150px 0 100px 0;
+    padding: 100px 0 100px 0;
+    filter: drop-shadow(8px 8px 16px rgba(0, 0, 0, 0.3));
 }
 
 .header-info {
@@ -240,11 +252,13 @@ th, td {
 
 .header-txt {
     width: 50%;
+    margin-top: 15%;
 }
 
 .header-txt h1 {
     font-size: 50px;
-    color: #FEFFFF;
+    color: #181818;
+    /* -webkit-text-stroke: 2px black; */
     text-transform: capitalize;
 }
 
@@ -273,12 +287,12 @@ th, td {
 .precio-2,
 .precio {
     font-size: 30px;
-    color: #7270EC !important;
+    color: rgb(0, 101, 187) !important;
 }
 
 .btn-1 {
     display: inline-block;
-    background-color: #7270EC;
+    background-color: rgb(0, 101, 187);
     color: #FEFFFF;
     font-size: 18px;
     padding: 10px 25px;
@@ -287,7 +301,7 @@ th, td {
 }
 
 .btn-1:hover {
-    background-color: #6C69F9;
+    background-color: rgb(0, 84, 158);
     transition: 0.5s;
 }
 
@@ -303,7 +317,7 @@ hr {
 
 .promociones h2 {
     font-size: 50px;
-    color: #FEFFFF;
+    color: #181818;
     margin-bottom: 35px;
 }
 
@@ -329,7 +343,7 @@ hr {
 }
 
 .seccion-1 h3 {
-    color: #FEFFFF;
+    color: #181818;
     font-size: 22px;
     font-weight: 600;
 }
@@ -350,13 +364,13 @@ hr {
 }
 
 .productos {
-    margin-top: 50px !important;
+    margin-top: 75px !important;
     padding-top: 0 !important;
 }
 
 .productos h2 {
     font-size: 50px;
-    color: #FEFFFF;
+    color: #181818;
     margin-bottom: 40px;
     text-align: center;
 }
@@ -387,14 +401,16 @@ hr {
     display: inline-block;
     padding: 10px 25px;
     font-size: 14px;
-    color: #FEFFFF;
-    border: 1px solid #7270EC;
+    color: #181818;
+    border: 1px solid rgb(0, 101, 187);
     border-radius: 25px;
     margin-top: 15px;
+    transition: 0.5s;
 }
 
 .btn-3:hover {
-    background-color: #7270EC;
+    background-color: rgb(0, 101, 187);
+    color: #FEFFFF;
     transition: 0.5s;
 }
 
@@ -409,12 +425,12 @@ hr {
 }
 
 .link h3 {
-    color: #FEFFFF;
+    color: #181818;
     margin-bottom: 20px;
 }
 
 .link a {
-    color: #FEFFFF;
+    color: #181818;
     font-size: 16px;
     display: block;
     margin-bottom: 10px;
@@ -444,31 +460,204 @@ hr {
     width: 768px;
     max-width: 100%;
     min-width: 480px;
+    height: 520px; 
 }
 
 .containerLogin p {
     font-size: 14px;
-    line-height: 20px;
+    line-height: 22px;
     letter-spacing: 0.3px;
-    margin: 20px 0;
+    margin: 20px 0; 
 }
 
 .containerLogin span {
-    font-size: 12px;
+    font-size: 13px;
+    margin-bottom: 12px;
 }
 
 .containerLogin button {
     background-color: rgb(0, 101, 187);
     color: white;
     font-size: 12px;
-    padding: 10px 45px;
+    padding: 12px 45px;
     border: 1px solid transparent;
     border-radius: 20px;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin-top: 10px;
+    margin-top: 15px;
     cursor: pointer;
+}
+
+.toggle-panel button.hidden {
+    background-color: transparent;
+    border: 1px solid #fff;
+}
+
+.containerLogin form {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    height: 100%;
+}
+
+.containerLogin h1 {
+    margin-bottom: 10px; 
+}
+
+.social-icon {
+    margin: 10px 0 15px 0;
+}
+
+.social-icon a {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;  
+    height: 48px; 
+    font-size: 22px; 
+    color: #4285F4; 
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.social-icon a:hover {
+    background-color: #f8f9fa;
+    border-color: #4285F4;
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.25);
+}
+
+.containerLogin input {
+    background-color: #eee;
+    border: none;
+    margin: 6px 0; 
+    padding: 11px 15px; 
+    font-size: 13px;
+    border-radius: 10px;
+    width: 100%;
+    outline: none;
+}
+
+.containerLogin a {
+    margin: 10px 0 5px 0; 
+    font-size: 13px;
+    color: #333;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-container h1 {
+    margin-bottom: 0%;
+}
+
+.sign-in {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.containerLogin.active .sign-in {
+    transform: translateX(100%);
+}
+
+.sign-up {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.containerLogin.active .sign-up {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: move 0.2s;
+}
+
+@keyframes move {
+    0%, 49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+    50%, 100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.toggle-container {
+    position: absolute; 
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+    border-radius: 110px 0 0 70px;
+    z-index: 1000;
+}
+
+.containerLogin.active .toggle-container {
+    transform: translateX(-100%);
+    border-radius: 0 110px 70px 0;
+}
+
+.toggle {
+    background-color: rgb(0, 100, 185);
+    height: 100%;
+    background: linear-gradient(to right, rgb(0, 65, 125), rgb(0, 110, 210));
+    color: #FEFFFF;
+    position: relative;
+    left: -100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: all 0.2s ease-in-out;
+}
+
+.containerLogin.active .toggle {
+    transform: translateX(50%);
+}
+
+.toggle-panel {
+    position: absolute; 
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 30px;
+    text-align: center;
+    top: 0;
+    transform: translateX(0);
+    transition: all 0.2s ease-in-out;
+}
+
+.toggle-left {
+    transform: translateX(-200%);
+}
+
+.containerLogin.active .toggle-left {
+    transform: translateX(0);
+}
+
+.toggle-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.containerLogin.active .toggle-right {
+    transform: translateX(200%); 
 }
 
 
@@ -505,7 +694,7 @@ hr {
         justify-content: space-between; 
         align-items: center;
         width: 100%;
-        position: relative; 
+        position: fixed; 
     }
 
     .menu label #menu-icono {
@@ -552,7 +741,7 @@ hr {
     }
 
     .header-content {
-        padding: 1px 0 10px 0;
+        padding: 80px 0 10px 0;
     }
 
     .mySwiper-1 {
@@ -571,9 +760,9 @@ hr {
         padding: 0;
         display: flex;
         flex-direction: column;
-        align-items: center;    /* Centra horizontalmente todo el contenido */
+        align-items: center;    
         justify-content: center;
-        text-align: center;     /* Centra todo el texto */
+        text-align: center;     
         width: 100%;
     }
 

@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ .Title }}</title>
+        <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="/static/css/checkout.css">
     </head>
@@ -11,7 +12,6 @@
 
         <div class="checkout-contenedor">
 
-            <!-- PANEL IZQUIERDO: resumen de la compra, viene 100% del backend -->
             <div class="checkout-panel-izquierdo">
                 <div class="checkout-marca-comercio">{{ .NombreComercio }}</div>
                 <div class="checkout-rif">{{ .Rif }}</div>
@@ -44,7 +44,6 @@
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: formulario real -->
             <div class="checkout-panel-derecho">
                 <div class="checkout-logo-sypago">sy<span>pago</span></div>
 
@@ -78,12 +77,8 @@
                             <option value="0174">Banplus (0174)</option>
                             <option value="0175">Banco Bicentenario (0175)</option>
                             <option value="0177">Banco de la Fuerza Armada (0177)</option>
-                            <option value="0190">Banco Nacional de Crédito (0190)</option>
                             <option value="0191">Banco Nacional de Crédito BNC (0191)</option>
                         </select>
-                        <p class="checkout-nota-campo">
-                            Verifica esta lista de códigos contra la documentación oficial de Sypago antes de producción.
-                        </p>
                     </div>
 
                     <div class="checkout-tabs-metodo" id="tabs-tipo-cuenta">
@@ -117,10 +112,9 @@
                     <p class="checkout-mensaje-error" id="checkout-mensaje-error"></p>
                 </form>
 
-                <!-- Bloque OTP, oculto hasta que se solicite el código exitosamente -->
                 <div class="checkout-bloque-otp" id="checkout-bloque-otp" style="display:none;">
                     <p class="checkout-otp-instrucciones">
-                        Ingrese la clave de pago enviada por SMS, correo electrónico o notificación en su App Bancaria.
+                        Ingrese la clave de pago enviada por correo electrónico o notificación en su App Bancaria.
                     </p>
                     <div class="checkout-otp-casillas" id="checkout-otp-casillas">
                         <input type="text" maxlength="1" inputmode="numeric">
@@ -132,16 +126,26 @@
                         <input type="text" maxlength="1" inputmode="numeric">
                         <input type="text" maxlength="1" inputmode="numeric">
                     </div>
-                    <button type="button" class="checkout-btn-pagar" id="checkout-boton-confirmar-otp" disabled>
-                        Confirmar (pendiente de implementar)
+                    <button type="button" class="checkout-btn-pagar" id="checkout-boton-confirmar-otp">
+                        Confirmar
                     </button>
                     <p class="checkout-otp-contador" id="checkout-otp-contador"></p>
+                    <button type="button" class="checkout-btn-reenviar-otp" id="checkout-boton-reenviar-otp" style="display:none;">
+                        Solicitar nuevo código
+                    </button>
+                    <p class="checkout-mensaje-error" id="checkout-otp-mensaje-error"></p>
                 </div>
+
+                <div class="checkout-bloque-procesando" id="checkout-bloque-procesando" style="display:none;">
+                    <div class="checkout-spinner"></div>
+                    <p id="checkout-procesando-texto">Verificando el pago con tu banco...</p>
+                </div>
+
+                <div class="checkout-bloque-resultado" id="checkout-bloque-resultado" style="display:none;"></div>
             </div>
 
         </div>
 
-        <!-- Overlay del modal de confirmación, se llena dinámicamente desde JS -->
         <div class="checkout-overlay-modal" id="checkout-overlay-confirmacion" style="display:none;">
             <div class="checkout-tarjeta-modal">
                 <h3>Confirmar compra</h3>

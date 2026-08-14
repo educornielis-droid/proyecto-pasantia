@@ -14,10 +14,8 @@ import (
 )
 
 /* ============================================================
-   CHECKOUT: crear la transacción a partir del carrito y
+   crear la transacción a partir del carrito y
    mostrar checkout.html con esos datos.
-   (Esto es lógica propia de la tienda, no de la API de Sypago,
-   por eso vive separado de sypagoService.go)
    ============================================================ */
 
 type productoSolicitado struct {
@@ -43,6 +41,15 @@ type transaccion struct {
 	Total       float64
 	CreadaEn    time.Time
 	DatosDebito *datosDebitoPendiente
+	Pago        *resultadoPago // se llena cuando Sypago acepta la solicitud de débito
+}
+
+// Resultado que devuelve Sypago al aceptar la solicitud de débito con OTP.
+type resultadoPago struct {
+	TransactionID   string
+	OperationSecret string
+	Estado          string
+	ActualizadoEn   time.Time
 }
 
 // Datos del pagador guardados al solicitar el OTP, para reutilizarlos
@@ -52,11 +59,6 @@ type datosDebitoPendiente struct {
 	DocumentInfo   documentoInfo
 	DebitorAccount cuentaSypago
 }
-
-/* ------------------------------------------------------------
-   ALMACENAMIENTO TEMPORAL EN MEMORIA
-   (mañana esto se reemplaza por una tabla en PostgreSQL)
-------------------------------------------------------------- */
 
 var (
 	almacenTransacciones = make(map[string]transaccion)
@@ -90,14 +92,27 @@ func guardarDatosDebitoPendiente(idTransaccion string, datos datosDebitoPendient
 	return true
 }
 
-/* ------------------------------------------------------------
-   Checkout registra las 2 rutas de este archivo, siguiendo el
-   mismo patrón que TdC() en sypagoService.go.
-------------------------------------------------------------- */
+// Se llama justo después de que Sypago acepta la solicitud de débito
+// (guarda transaction_id + operation_secret con estado PEND), y de
+// nuevo cada vez que el polling obtiene un estado actualizado.
+func guardarResultadoPago(idTransaccion string, resultado resultadoPago) bool {
+	mutexTransacciones.Lock()
+	defer mutexTransacciones.Unlock()
+
+	transaccionExistente, existe := almacenTransacciones[idTransaccion]
+	if !existe {
+		return false
+	}
+
+	resultado.ActualizadoEn = time.Now()
+	transaccionExistente.Pago = &resultado
+	almacenTransacciones[idTransaccion] = transaccionExistente
+	return true
+}
 
 func Checkout(ruta *gin.Engine) {
 
-	// PASO 1: el carrito inicia la transacción
+	// el carrito inicia la transacción
 	ruta.POST("/api/checkout/iniciar", func(contexto *gin.Context) {
 		var solicitud solicitudCheckout
 
@@ -120,8 +135,7 @@ func Checkout(ruta *gin.Engine) {
 				return
 			}
 
-			// Recalculamos SIEMPRE desde la BD, nunca confiamos en un
-			// precio que pudiera venir del navegador.
+			// Recalculamos SIEMPRE desde la BD, nunca confiamos en un precio que pudiera venir del navegador.
 			productoBD, err := database.ObtenerProductoPorNombre(itemSolicitado.Nombre)
 			if err != nil {
 				contexto.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Producto no encontrado: %s", itemSolicitado.Nombre)})
@@ -170,7 +184,7 @@ func Checkout(ruta *gin.Engine) {
 		})
 	})
 
-	// PASO 2: mostrar checkout.html con los datos guardados
+	// mostrar checkout.html con los datos guardados
 	ruta.GET("/checkout/:idTransaccion", func(contexto *gin.Context) {
 		idTransaccion := contexto.Param("idTransaccion")
 
@@ -187,12 +201,13 @@ func Checkout(ruta *gin.Engine) {
 			"Productos":      transaccionEncontrada.Productos,
 			"Total":          transaccionEncontrada.Total,
 			"IDTransaccion":  transaccionEncontrada.ID,
+			"Logo":           "/static/img/sypago_spinner.svg",
 		})
 	})
 }
 
 /* ------------------------------------------------------------
-   UTILIDAD: ID único de 12 caracteres hexadecimales
+   ID único de 12 caracteres hexadecimales
    (la usan tanto checkout.go como sypagoService.go)
 ------------------------------------------------------------- */
 

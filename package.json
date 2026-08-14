@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "run": "npm run dev"
+  },
+  "dependencies": {
+    "firebase": "^12.17.1"
+  }
+}
