@@ -363,8 +363,11 @@ hr {
     padding-bottom: 20px !important;
 }
 
+/* productos */
+
+
 .productos {
-    margin-top: 75px !important;
+    margin-top: 85px !important;
     padding-top: 0 !important;
 }
 
@@ -413,6 +416,196 @@ hr {
     color: #FEFFFF;
     transition: 0.5s;
 }
+
+/* ============================================================
+   PRODUCTOS.HTML — Showcase de un producto + filtro de categorías
+   Reutiliza la paleta ya existente del sitio:
+   azul rgb(0,101,187) / degradado rgb(0,65,125)→rgb(0,110,210),
+   tarjetas blancas redondeadas, Poppins.
+   ============================================================ */
+
+#lista-2 h2 {
+    text-align: center;
+}
+
+/* -------- Dropdown de categorías, colgando del link "Productos" -------- */
+.nav-productos-item {
+    position: relative;
+}
+
+.categorias-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 10px;
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    z-index: 1100;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.categorias-dropdown.abierto {
+    display: flex;
+}
+
+.categorias-dropdown button {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    color: #181818;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.categorias-dropdown button:hover {
+    background-color: #eef4fb;
+}
+
+.categorias-dropdown button.categoria-activa {
+    background: linear-gradient(to right, rgb(0, 65, 125), rgb(0, 110, 210));
+    color: #FEFFFF;
+    font-weight: 600;
+}
+
+/* -------- Showcase: un producto grande con flechas a los lados -------- */
+.showcase-productos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.flecha {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background-color: #ffffff;
+    color: rgb(0, 101, 187);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    transition: 0.25s;
+}
+
+.flecha:hover {
+    background-color: rgb(0, 101, 187);
+    color: #ffffff;
+    transform: scale(1.06);
+}
+
+.flecha:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.showcase-tarjeta {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 30px;
+    padding: 50px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 0.7fr;
+    align-items: center;
+    gap: 30px;
+    min-height: 380px;
+}
+
+.showcase-izquierda {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.showcase-nombre {
+    font-size: 28px;
+    font-weight: 800;
+    color: #181818;
+    line-height: 1.2;
+}
+
+.showcase-descripcion {
+    font-size: 15px;
+    color: #747B8F;
+    line-height: 1.5;
+}
+
+.showcase-boton {
+    margin-top: 10px;
+}
+
+.showcase-centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.showcase-imagen {
+    max-width: 100%;
+    max-height: 230px;
+    object-fit: contain;
+}
+
+.showcase-sombra {
+    width: 55%;
+    height: 22px;
+    margin-top: -8px;
+    background: radial-gradient(ellipse at center, rgba(0, 50, 100, 0.35) 0%, rgba(0, 50, 100, 0) 75%);
+    filter: blur(4px);
+}
+
+.showcase-derecha {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 4px;
+}
+
+.showcase-precio-label {
+    font-size: 13px;
+    color: #747B8F;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.showcase-precio {
+    font-size: 34px;
+    font-weight: 800;
+    color: rgb(0, 101, 187);
+}
+
+.showcase-sin-productos {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #747B8F;
+    font-size: 16px;
+    padding: 60px 0;
+}
+
+.showcase-indicador {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #747B8F;
+}
+
+
 
 .footer {
     display: flex;
@@ -852,6 +1045,28 @@ hr {
     .productos h2 {
         font-size: 40px;
         margin-bottom: 40px;
+    }
+
+    .showcase-tarjeta {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 35px 25px;
+    }
+
+    .showcase-izquierda,
+    .showcase-derecha {
+        align-items: center;
+        text-align: center;
+    }
+
+    .showcase-productos {
+        gap: 10px;
+    }
+
+    .flecha {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
     }
 
     .footer {

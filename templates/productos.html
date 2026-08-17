@@ -11,17 +11,22 @@
     <body>
         <header class="header header-productos">
             <div class="menu container">
-                
+
                 <a href="#" class="logo">Sypago Store</a>
                 <input type="checkbox" id="menu"/>
                 <label for="menu">
                     <i class="fa-solid fa-bars" id="menu-icono"></i>
                 </label>
-                
+
                 <nav class="navbar">
                     <ul>
                         <li><a href="/app">Inicio</a></li>
-                        <li><a href="#">Productos</a></li>
+                        <li class="nav-productos-item">
+                            <a href="#" id="btn-menu-productos">Productos</a>
+                            <div class="categorias-dropdown" id="categorias-dropdown">
+                                <!-- Las categorías se generan dinámicamente desde productos.js -->
+                            </div>
+                        </li>
                         <li><a href="#">Nosotros</a></li>
                     </ul>
                 </nav>
@@ -70,45 +75,45 @@
         </header>
 
         <section class="productos container" id="lista-2">
-            
-            <h2>Lista de Productos</h2>
 
-            <div class="swiper mySwiper-2">
+            <h2 id="titulo-categoria-actual">Todos los productos</h2>
 
-                <div class="swiper-wrapper">
-                    
-                    {{ range .Productos }}
-                    <div class="swiper-slide">
-                        <div class="producto">
-                            <img src="{{ .ImagenURL }}" alt="{{ .Nombre }}" loading="lazy">
-                            <div class="producto-txt">
-                                <h3>{{ .Nombre }}</h3>
-                                <p>{{ .Descripcion }}</p>
-                                <p>Unidades disponibles:{{ .Stock }}</p>
-                                <p class="precio">${{ printf "%.2f" .Precio }}</p>
-                                <a href="#" class="agregar-carrito btn-3" 
-                                data-nombre="{{ .Nombre }}" 
-                                data-precio="{{ .Precio }}"
-                                data-imagen="{{ .ImagenURL }}">
-                                Agregar al Carrito
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+            <div class="showcase-productos" id="showcase-productos">
 
-                    {{ else }}
-                        <p>No hay productos disponibles por el momento.</p>
-                    {{ end }}            
+                <button type="button" class="flecha flecha-izq" id="flecha-anterior" aria-label="Producto anterior">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
 
+                <div class="showcase-tarjeta" id="showcase-tarjeta">
+                    <!-- Se llena dinámicamente desde productos.js con el producto actual -->
                 </div>
 
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                <button type="button" class="flecha flecha-der" id="flecha-siguiente" aria-label="Producto siguiente">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
 
             </div>
 
-            <!-- <H1>LISTA DE PRODUCTOS</H1>
-            <p>{{.Productos}}</p> -->
+            <div class="showcase-indicador" id="showcase-indicador"></div>
+
+            <!-- Fuente de datos real: cada producto que venga del backend queda
+                 aquí oculto; productos.js los lee para armar el showcase y el
+                 filtro de categorías. Así el HTML sigue siendo 100% dinámico. -->
+            <div id="datos-productos" hidden>
+                {{ range .Productos }}
+                <div class="producto-dato"
+                     data-nombre="{{ .Nombre }}"
+                     data-descripcion="{{ .Descripcion }}"
+                     data-stock="{{ .Stock }}"
+                     data-precio="{{ printf "%.2f" .Precio }}"
+                     data-imagen="{{ .ImagenURL }}"
+                     data-categoria="{{ .NombreCategoria }}">
+                </div>
+                {{ else }}
+                <p class="sin-productos-dato">No hay productos disponibles por el momento.</p>
+                {{ end }}
+            </div>
+
         </section>
 
         <footer class="footer container">
@@ -142,5 +147,6 @@
 
         </footer>
         <script src="/static/js/carrito.js"></script>
+        <script src="/static/js/productos.js"></script>
     </body>
 </html>
