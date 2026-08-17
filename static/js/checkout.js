@@ -1,3 +1,7 @@
+/* ============================================================
+   CHECKOUT.HTML - Lógica del formulario de pago y solicitud OTP
+   ============================================================ */
+
 console.log("[Checkout] checkout.js se cargó correctamente.");
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -99,7 +103,8 @@ function inicializarCheckout() {
 }
 
 /* ------------------------------------------------------------
-   VALIDACIÓN BÁSICA DEL FORMULARIO para pagar
+   VALIDACIÓN BÁSICA DEL FORMULARIO (del lado del cliente,
+   el backend igual debe validar todo de nuevo)
 ------------------------------------------------------------- */
 function validarFormularioPago() {
     const banco = document.getElementById("campo-banco").value;
@@ -214,15 +219,17 @@ function mostrarBloqueOtp() {
         primeraCasilla.focus();
     }
 
-    iniciarContadorReenvio(300); // 300 segundos, igual q Sypago 
+    iniciarContadorReenvio(300); // 300 segundos, igual que el "expiration" que Sypago maneja
 }
 
 /* ------------------------------------------------------------
    CONFIRMAR EL CÓDIGO OTP QUE EL USUARIO ESCRIBIÓ
+   (esto solo ENVÍA la solicitud - el resultado real se sabe
+   con el polling de más abajo)
 ------------------------------------------------------------- */
 let intervaloPolling = null;
 let intentosPolling = 0;
-const MAXIMO_INTENTOS_POLLING = 60; // 60 x 2.5s = 150 segundos como techo (2minutos, 30s)
+const MAXIMO_INTENTOS_POLLING = 60; // 60 x 2.5s = 150 segundos como techo
 
 async function confirmarCodigoOtp() {
     const idTransaccion = document.getElementById("id-transaccion").value;
@@ -277,7 +284,8 @@ function mostrarBloqueProcesando() {
 }
 
 /* ------------------------------------------------------------
-   POLLING: consulta el estado real cada 2.5 segundos hasta obtener un estado definitivo (ACCP, RJCT o CANC).
+   POLLING: consulta el estado real cada 2.5 segundos hasta
+   obtener un estado definitivo (ACCP, RJCT o CANC).
 ------------------------------------------------------------- */
 async function consultarEstadoTransaccion(idTransaccion) {
     intentosPolling++;
@@ -331,6 +339,17 @@ function mostrarResultadoFinal(tipo, titulo, mensaje) {
     bloqueResultado.className = "checkout-bloque-resultado " + tipo;
     bloqueResultado.innerHTML = "<h2>" + titulo + "</h2><p>" + mensaje + "</p>";
     bloqueResultado.style.display = "block";
+
+    // Si la compra fue exitosa, "Regresar" ya no debe llevar de vuelta a
+    // productos.html (ahí no hay nada más que hacer con esta compra),
+    // sino al inicio para arrancar un nuevo proceso desde cero.
+    if (tipo === "exito") {
+        const botonRegresar = document.getElementById("checkout-boton-regresar");
+        if (botonRegresar) {
+            botonRegresar.href = "/app";
+            botonRegresar.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver al inicio';
+        }
+    }
 }
 
 function iniciarContadorReenvio(segundosIniciales) {
@@ -363,7 +382,8 @@ function iniciarContadorReenvio(segundosIniciales) {
 }
 
 /* ------------------------------------------------------------
-   REENVIAR CÓDIGO: reutiliza los mismos datos del formulario  y vuelve
+   REENVIAR CÓDIGO: reutiliza los mismos datos del formulario
+   (siguen en el DOM aunque el formulario esté oculto) y vuelve
    a pedir un OTP nuevo al backend.
 ------------------------------------------------------------- */
 async function reenviarCodigoOtp() {

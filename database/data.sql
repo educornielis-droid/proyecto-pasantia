@@ -176,3 +176,69 @@ WHERE producto_id = 1;
 UPDATE productos 
 SET imagen_url = '/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png'
 WHERE producto_id = 2;
+
+-- no hay id=3
+
+UPDATE productos 
+SET imagen_url = '/static/img/Laptop_Pro_15.png'
+WHERE producto_id = 4;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Monitor_Gamer_27.png'
+WHERE producto_id = 5;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Teclado_Mecánico_RGB.png'
+WHERE producto_id = 6;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Mouse_Inalámbrico_Ergonómico.png'
+WHERE producto_id = 7;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Auriculares_Bluetooth_Noise_Cancelling.png'
+WHERE producto_id = 8;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Corneta_Portátil_Waterproof.png'
+WHERE producto_id = 9;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Smartphone_X200_128GB.png'
+WHERE producto_id = 10;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Cargador_Rápido_65W_GaN.png'
+WHERE producto_id = 11;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Laptop_Pro_15.png'
+WHERE producto_id = 4;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Monitor_Gamer_27.png'
+WHERE producto_id = 5;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Teclado_Mecánico_RGB.png'
+WHERE producto_id = 6;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Mouse_Inalámbrico_Ergonómico.png'
+WHERE producto_id = 7;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Auriculares_Bluetooth_Noise_Cancelling.png'
+WHERE producto_id = 8;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Corneta_Portátil_Waterproof.png'
+WHERE producto_id = 9;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Smartphone_X200_128GB.png'
+WHERE producto_id = 10;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Gorra_Sypago.png'
+WHERE producto_id = 31;

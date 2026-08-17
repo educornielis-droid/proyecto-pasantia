@@ -607,6 +607,35 @@ hr {
 
 
 
+/* -------- Transición al cambiar de producto (flechas) -------- */
+.showcase-tarjeta {
+    transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.showcase-anim-salida-izq {
+    transform: translateX(-30px);
+    opacity: 0;
+}
+
+.showcase-anim-salida-der {
+    transform: translateX(30px);
+    opacity: 0;
+}
+
+.showcase-anim-entrada-der {
+    transform: translateX(30px);
+    opacity: 0;
+    transition: none;
+}
+
+.showcase-anim-entrada-izq {
+    transform: translateX(-30px);
+    opacity: 0;
+    transition: none;
+}
+
+
+
 .footer {
     display: flex;
     padding: 30px 0;

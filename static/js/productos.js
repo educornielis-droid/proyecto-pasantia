@@ -75,7 +75,6 @@ function leerProductosDesdeElDOM() {
         return {
             nombre: nodo.dataset.nombre,
             descripcion: nodo.dataset.descripcion,
-            stock: nodo.dataset.stock,
             precio: parseFloat(nodo.dataset.precio),
             imagen: nodo.dataset.imagen || "",
             categoria: nodo.dataset.categoria || "Sin categoría"
@@ -116,7 +115,17 @@ function crearBotonCategoria(valorCategoria, textoVisible) {
         categoriaActual = valorCategoria;
         indiceActual = 0;
         actualizarBotonCategoriaActiva();
-        renderizarProductoActual();
+
+        const tarjeta = document.getElementById("showcase-tarjeta");
+        tarjeta.classList.add("showcase-anim-salida-izq");
+        setTimeout(function () {
+            renderizarProductoActual();
+            tarjeta.classList.remove("showcase-anim-salida-izq");
+            tarjeta.classList.add("showcase-anim-entrada-der");
+            void tarjeta.offsetWidth;
+            tarjeta.classList.remove("showcase-anim-entrada-der");
+        }, DURACION_ANIMACION_MS);
+
         document.getElementById("categorias-dropdown").classList.remove("abierto");
     });
 
@@ -178,7 +187,6 @@ function renderizarProductoActual() {
             <a href="#" class="agregar-carrito btn-3 showcase-boton"
                data-nombre="${escaparAtributo(producto.nombre)}"
                data-precio="${producto.precio}"
-               data-stock="${escaparAtributo(producto.stock)}"
                data-imagen="${escaparAtributo(producto.imagen)}">
                Agregar al Carrito
             </a>
@@ -201,12 +209,38 @@ function renderizarProductoActual() {
     flechaSiguiente.disabled = soloUnProducto;
 }
 
+const DURACION_ANIMACION_MS = 220;
+let animandoShowcase = false;
+
 function moverShowcase(direccion) {
     const productos = productosFiltrados();
-    if (productos.length <= 1) return;
+    if (productos.length <= 1 || animandoShowcase) return;
 
-    indiceActual = (indiceActual + direccion + productos.length) % productos.length;
-    renderizarProductoActual();
+    const tarjeta = document.getElementById("showcase-tarjeta");
+    animandoShowcase = true;
+
+    // 1. El producto actual "sale" hacia el lado contrario a donde apunta la flecha
+    tarjeta.classList.add(direccion > 0 ? "showcase-anim-salida-izq" : "showcase-anim-salida-der");
+
+    setTimeout(function () {
+        indiceActual = (indiceActual + direccion + productos.length) % productos.length;
+        renderizarProductoActual();
+
+        // 2. Colocamos el nuevo contenido ya desplazado, del lado por donde "entra"
+        tarjeta.classList.remove("showcase-anim-salida-izq", "showcase-anim-salida-der");
+        tarjeta.classList.add(direccion > 0 ? "showcase-anim-entrada-der" : "showcase-anim-entrada-izq");
+
+        // 3. Forzamos que el navegador registre esa posición inicial antes de animar
+        void tarjeta.offsetWidth;
+
+        // 4. Quitamos la clase de "entrada": como .showcase-tarjeta ya tiene
+        //    transition definida, esto anima suavemente hasta la posición normal
+        tarjeta.classList.remove("showcase-anim-entrada-der", "showcase-anim-entrada-izq");
+
+        setTimeout(function () {
+            animandoShowcase = false;
+        }, DURACION_ANIMACION_MS);
+    }, DURACION_ANIMACION_MS);
 }
 
 function mostrarSinProductos() {

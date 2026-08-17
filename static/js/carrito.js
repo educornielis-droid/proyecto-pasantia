@@ -94,6 +94,17 @@ function inicializarCarrito() {
     }
 }
 
+// Si el usuario llega a esta página usando el botón "atrás" del navegador,
+// Chrome puede restaurarla desde el bfcache tal cual quedó (botón "Pagar"
+// deshabilitado con texto "Procesando..." incluido). Esto lo reinicia.
+window.addEventListener("pageshow", function (evento) {
+    if (evento.persisted && botonPagarCarrito) {
+        botonPagarCarrito.style.pointerEvents = "auto";
+        botonPagarCarrito.style.opacity = "1";
+        botonPagarCarrito.textContent = "Pagar";
+    }
+});
+
 /* ------------------------------------------------------------
    3. LECTURA / ESCRITURA EN sessionStorage
 ------------------------------------------------------------- */

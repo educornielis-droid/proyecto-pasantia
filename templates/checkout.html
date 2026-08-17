@@ -4,7 +4,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ .Title }}</title>
-        <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="/static/css/checkout.css">
     </head>
@@ -12,7 +11,12 @@
 
         <div class="checkout-contenedor">
 
+            <!-- PANEL IZQUIERDO: resumen de la compra, viene 100% del backend -->
             <div class="checkout-panel-izquierdo">
+                <a href="/app/productos" class="checkout-boton-regresar" id="checkout-boton-regresar">
+                    <i class="fa-solid fa-arrow-left"></i> Regresar
+                </a>
+
                 <div class="checkout-marca-comercio">{{ .NombreComercio }}</div>
                 <div class="checkout-rif">{{ .Rif }}</div>
 
@@ -44,6 +48,7 @@
                 </div>
             </div>
 
+            <!-- PANEL DERECHO: formulario real -->
             <div class="checkout-panel-derecho">
                 <div class="checkout-logo-sypago">sy<span>pago</span></div>
 
@@ -77,6 +82,7 @@
                             <option value="0174">Banplus (0174)</option>
                             <option value="0175">Banco Bicentenario (0175)</option>
                             <option value="0177">Banco de la Fuerza Armada (0177)</option>
+                            <option value="0190">Banco Nacional de Crédito (0190)</option>
                             <option value="0191">Banco Nacional de Crédito BNC (0191)</option>
                         </select>
                     </div>
@@ -114,7 +120,7 @@
 
                 <div class="checkout-bloque-otp" id="checkout-bloque-otp" style="display:none;">
                     <p class="checkout-otp-instrucciones">
-                        Ingrese la clave de pago enviada por correo electrónico o notificación en su App Bancaria.
+                        Ingrese la clave de pago enviada por SMS, correo electrónico o notificación en su App Bancaria.
                     </p>
                     <div class="checkout-otp-casillas" id="checkout-otp-casillas">
                         <input type="text" maxlength="1" inputmode="numeric">

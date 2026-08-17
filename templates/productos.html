@@ -85,7 +85,9 @@
                 </button>
 
                 <div class="showcase-tarjeta" id="showcase-tarjeta">
-                    <!-- Se llena dinámicamente desde productos.js con el producto actual -->
+                    <div class="showcase-contenido" id="showcase-contenido">
+                        <!-- Se llena dinámicamente desde productos.js con el producto actual -->
+                    </div>
                 </div>
 
                 <button type="button" class="flecha flecha-der" id="flecha-siguiente" aria-label="Producto siguiente">
@@ -104,7 +106,6 @@
                 <div class="producto-dato"
                      data-nombre="{{ .Nombre }}"
                      data-descripcion="{{ .Descripcion }}"
-                     data-stock="{{ .Stock }}"
                      data-precio="{{ printf "%.2f" .Precio }}"
                      data-imagen="{{ .ImagenURL }}"
                      data-categoria="{{ .NombreCategoria }}">
