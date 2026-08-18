@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ .Titulo }}</title>
+        <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body class="bodyAdmin-login">
+
+        <div class="formularioAdmin"> <!--formulario-->
+            <h1>Inicio de Sesion</h1>
+            <form action="" method="post" class="formAdmin">
+
+                <div class="nameAdmin">  <!--username-->
+                    <input type="text" id="nombreAdmin" placeholder="Nombre" required>
+                </div>
+
+                <div class="contraseñaAdmin"> <!--contrasena-->
+                    <input type="password" id="contrasenaAdmin" placeholder="Contraseña" required>
+                </div>
+
+                <button type="submit">Ingresar</button>
+
+            </form>
+        </div>
+
+    </body>
+</html>

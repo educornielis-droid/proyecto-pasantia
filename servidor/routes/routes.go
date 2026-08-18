@@ -65,6 +65,13 @@ func SetupRoutes(ruta *gin.Engine) {
 		})
 	})
 
+	ruta.GET("/app/admin/login", func(contexto *gin.Context) {
+		contexto.HTML(http.StatusOK, "adminLogin.html", gin.H{
+			"Titulo": "Login admin - Sypago Store",
+			"Logo":   "/static/img/sypago_spinner.svg",
+		})
+	})
+
 	ruta.GET("/api/v1", func(contexto *gin.Context) {
 		productos, err := database.ObtenerProductos()
 		if err != nil {

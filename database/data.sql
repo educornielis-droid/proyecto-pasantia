@@ -240,5 +240,136 @@ SET imagen_url = '/static/img/Smartphone_X200_128GB.png'
 WHERE producto_id = 10;
 
 UPDATE productos 
+SET imagen_url = '/static/img/Cargador_Rápido_65W_GaN.png'
+WHERE producto_id = 11;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Hub_USB-C_7_en_1.png'
+WHERE producto_id = 12;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Silla_Gamer_Ergonómica.png'
+WHERE producto_id = 13;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Control_Inalámbrico_PC_Console.png'
+WHERE producto_id = 14;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Micrófono_Condensador_USB.png'
+WHERE producto_id = 15;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Tablet_10_64GB.png'
+WHERE producto_id = 16;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Mochila_Antirrobo_para_Laptop.png'
+WHERE producto_id = 17;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Disco_Duro_Externo_1TB.png'
+WHERE producto_id = 18;
+
+UPDATE productos 
+SET imagen_url = '/static/img/SSD_M.2_NVMe_500GB.png'
+WHERE producto_id = 19;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Cámara_Seguridad_Wi-Fi_1080p.png'
+WHERE producto_id = 20;
+
+
+UPDATE productos 
+SET imagen_url = '/static/img/Lámpara_LED_Escritorio_Inteligente.png'
+WHERE producto_id = 21;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Smartwatch_Deportivo.png'
+WHERE producto_id = 22;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Router_Wi-Fi_6_Doble_Banda.png'
+WHERE producto_id = 23;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Soporte_Aluminio_para_Laptop.png'
+WHERE producto_id = 24;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Pad_Mouse_XL_Gaming.png'
+WHERE producto_id = 25;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Barra_Sonido_para_TVPC.png'
+WHERE producto_id = 26;
+
+UPDATE productos 
+SET imagen_url = '/static/img/WebCam_Full_HD_1080p.png'
+WHERE producto_id = 27;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Cable_HDMI_2.1_8K.png'
+WHERE producto_id = 28;
+
+-- UPDATE productos 
+-- SET imagen_url = '/static/img/Cámara_Seguridad_Wi-Fi_1080p.png'
+-- WHERE producto_id = 29;
+
+-- UPDATE productos 
+-- SET imagen_url = '/static/img/Cámara_Seguridad_Wi-Fi_1080p.png'
+-- WHERE producto_id = 30;
+
+UPDATE productos 
 SET imagen_url = '/static/img/Gorra_Sypago.png'
 WHERE producto_id = 31;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Mini_PC_Ryzen_7.png'
+WHERE producto_id = 32;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Monitor_Portátil_15.6.png'
+WHERE producto_id = 33;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Teclado_Mecánico_60%_Inalámbrico.png'
+WHERE producto_id = 34;
+
+
+
+-- Reemplazo de las tablas "detalles" y "transacciones"
+
+DROP TABLE IF EXISTS detalles CASCADE;
+DROP TABLE IF EXISTS transacciones CASCADE;
+
+-- Cabecera de cada compra (una fila por transacción de pago)
+CREATE TABLE transacciones (
+    transaccion_id       TEXT PRIMARY KEY,              -- el idTransaccion que genera mi comercio (12 hex)
+    tipo_documento        TEXT NOT NULL,                 -- V, E, J, G
+    numero_documento      TEXT NOT NULL,
+    tipo_cuenta           TEXT NOT NULL,                 -- CELE o CNTA
+    cuenta_o_telefono     TEXT NOT NULL,
+    banco_origen          TEXT NOT NULL,                 -- del banco pagador
+    monto_final_usd       NUMERIC(12,2) NOT NULL,
+    monto_final_ves       NUMERIC(14,2) NOT NULL,
+    tasa_cambio           NUMERIC(10,4) NOT NULL,        
+    estado_transaccion    TEXT NOT NULL DEFAULT 'PEND',  -- PEND, PROC, ACCP, RJCT, CANC
+    referencia_sypago     TEXT,                          -- transaction_id que devuelve Sypago
+    fecha_creacion        TIMESTAMP NOT NULL DEFAULT now(),
+    fecha_actualizacion   TIMESTAMP NOT NULL DEFAULT now(), -- para saber cuándo cambió de estado por última vez (útil para el polling)
+    codigo_rechazo        TEXT                              -- (ej. AC04, AM04) cuando estado_transaccion = 'RJCT', para poder mostrarle al usuario o revisarlo después
+);
+
+
+-- Detalle: qué productos y cantidades tenía cada transacción
+CREATE TABLE detalles (
+    detalle_id         SERIAL PRIMARY KEY,
+    transaccion_id      TEXT NOT NULL REFERENCES transacciones(transaccion_id) ON DELETE CASCADE,
+    producto_id          INTEGER NOT NULL REFERENCES productos(producto_id),
+    cantidad_producto    INTEGER NOT NULL
+);
+
+-- Índice para consultar rápido "todas las transacciones de un producto" o "el detalle de una transacción" sin escanear toda la tabla.
+CREATE INDEX idx_detalles_transaccion ON detalles(transaccion_id);
+CREATE INDEX idx_detalles_producto ON detalles(producto_id);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,38 +12,68 @@
         
         <div class="containerLogin" id="containerLogin">
             
+            <!-- Registro -->
             <div class="form-container sign-up">
-                <form>
+                <form id="signup-form" novalidate>
                     <h1>Registro</h1>
                     <div class="social-icon">
                         <a href="javascript:void(0)" id="google-signup"><i class="fa-brands fa-google"></i></a>
                     </div>
                     <span>Usa tu correo para registrarte</span>
-                    <input type="text" placeholder="Nombre">
-                    <input type="text" placeholder="Apellido">
-                    <input type="email" placeholder="Correo">
-                    <input type="password" placeholder="Contraseña">
-                    <button>Crear cuenta</button>
+
+                    <div class="input-group">
+                        <input type="text" id="signup-name" placeholder="Nombre">
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="signup-lastname" placeholder="Apellido">
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="email" id="signup-email" placeholder="Correo">
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <div class="input-group password-group">
+                        <input type="password" id="signup-password" placeholder="Contraseña">
+                        <i class="fa-regular fa-eye toggle-password" data-target="signup-password"></i>
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <button type="submit">Crear cuenta</button>
                 </form>
             </div>
 
+            <!-- Iniciar Sesión -->
             <div class="form-container sign-in">
-                <form>
+                <form id="login-form" novalidate>
                     <h1>Iniciar sesión</h1>
                     <div class="social-icon">
                         <a href="javascript:void(0)" id="google-login"><i class="fa-brands fa-google"></i></a>
                     </div>
                     <span>Usa tu correo y contraseña para ingresar</span>
-                    <input type="email" placeholder="Correo">
-                    <input type="password" placeholder="Contraseña">
-                    <a href="#">Olvidaste tu contraseña?</a>
-                    <button>Iniciar sesión</button>
+
+                    <div class="input-group">
+                        <input type="email" id="login-email" placeholder="Correo">
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <div class="input-group password-group">
+                        <input type="password" id="login-password" placeholder="Contraseña">
+                        <i class="fa-regular fa-eye toggle-password" data-target="login-password"></i>
+                        <span class="error-msg"></span>
+                    </div>
+
+                    <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
+                    <button type="submit">Iniciar sesión</button>
                 </form>
             </div>
 
+            <!-- Contenedor Toggle -->
             <div class="toggle-container">
                 <div class="toggle">
-
                     <div class="toggle-panel toggle-left">
                         <h1>Bienvenido!</h1>
                         <p>Introduce tus datos personales para poder utilizar todas las funciones de la web.</p>
@@ -55,7 +85,6 @@
                         <p>Registra tus datos personales para poder utilizar todas las funciones de la web.</p>
                         <button class="hidden" id="register">Registro</button>
                     </div>
-
                 </div>
             </div>
 

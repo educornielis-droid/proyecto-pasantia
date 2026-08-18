@@ -417,13 +417,6 @@ hr {
     transition: 0.5s;
 }
 
-/* ============================================================
-   PRODUCTOS.HTML — Showcase de un producto + filtro de categorías
-   Reutiliza la paleta ya existente del sitio:
-   azul rgb(0,101,187) / degradado rgb(0,65,125)→rgb(0,110,210),
-   tarjetas blancas redondeadas, Poppins.
-   ============================================================ */
-
 #lista-2 h2 {
     text-align: center;
 }
@@ -516,11 +509,19 @@ hr {
     background-color: #ffffff;
     border-radius: 30px;
     padding: 50px 60px;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.showcase-contenido {
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1.1fr 0.7fr;
     align-items: center;
     gap: 30px;
-    min-height: 380px;
+    transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
 .showcase-izquierda {
@@ -606,12 +607,6 @@ hr {
 }
 
 
-
-/* -------- Transición al cambiar de producto (flechas) -------- */
-.showcase-tarjeta {
-    transition: transform 0.22s ease, opacity 0.22s ease;
-}
-
 .showcase-anim-salida-izq {
     transform: translateX(-30px);
     opacity: 0;
@@ -636,20 +631,99 @@ hr {
 
 
 
+/*Login del admin */
+.bodyAdmin-login {
+    background-color: #e2e2e2;
+    background: linear-gradient(to bottom right, rgb(158, 190, 219), #e2e2e2);
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+}
+
+.formularioAdmin {
+    position: absolute;
+    top: 40%;
+    left: 42%;
+    transform: translate(-20%, -35%);
+    width: 400px;
+    height: 315px;
+    background-color: #FEFFFF;
+    border-radius: 28px;
+}
+
+.formularioAdmin h1 {
+    text-align: center;
+    padding: 25px 0 20px 0;
+    color: rgb(0, 100, 185);
+}
+
+.formularioAdmin .formAdmin {
+    padding: 0 65px;
+}
+
+.formAdmin .nameAdmin {
+    position: relative;
+    margin: 13px 0;
+}
+
+.nameAdmin input,
+.contraseñaAdmin input {
+    width: 100%;
+    padding: 0 5px;
+    height: 40px;
+    font-size: 16px;
+    border: 1px solid rgb(0, 101, 187);
+    border-radius: 8px;
+    background: none;
+    outline: none;
+}
+
+.nameAdmin input::placeholder,
+.contraseñaAdmin input::placeholder {
+    padding: 5px 0;
+}
+
+.formAdmin button {
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    border: none;
+    margin-top: 33px;
+    background-color: rgb(0, 101, 187);
+    color: #FEFFFF;
+    transition: 0.2s all ease-in-out;
+}
+
+.formAdmin button:hover {
+    background-color: rgb(0, 84, 158);
+    transition: 0.2s all ease-in-out;
+}
+
+
+
+
 .footer {
     display: flex;
     padding: 30px 0;
 }
 
 .link {
-    margin-left: 170px;
+    margin-left: 60px;
     width: 20%;
+    text-align: center;
 }
 
 .link h3 {
     color: #181818;
-    margin-bottom: 20px;
+    margin-bottom: 49px;
+    margin-top: 70px;
 }
+
+/* .link svg {
+    justify-content: center;
+    text-align: center;
+    justify-items: center;
+    justify-self: center;
+} */
 
 .link a {
     color: #181818;
@@ -659,8 +733,9 @@ hr {
 }
 
 .link p {
-    color: #747B8F;
+    color: #181818;
     font-size: 16px;
+    text-align: center;
 }
 
 .body-login {
@@ -722,7 +797,7 @@ hr {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 0 40px;
+    padding: 0 35px;
     height: 100%;
 }
 
@@ -880,6 +955,83 @@ hr {
 
 .containerLogin.active .toggle-right {
     transform: translateX(200%); 
+}
+
+.input-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    margin: 4px 0 14px 0;
+}
+
+.containerLogin input.invalid {
+    border: 1px solid #e74c3c;
+    background-color: #fceae8;
+}
+
+.error-msg {
+    color: #e74c3c;
+    font-size: 11px;
+    min-height: 14px;
+    margin-left: 5px;
+    display: block;
+}
+
+.input-group input {
+    margin: 0;
+}
+
+/* Errores posicionados de forma absoluta para no desplazar elementos */
+.error-msg {
+    position: absolute;
+    bottom: 0;
+    left: 4px;
+    color: #cb0909;
+    user-select: none;
+    font-size: 10.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.containerLogin input.invalid {
+    border: 1px solid #cb0909;
+    background-color: #fceae8;
+}
+
+.containerLogin input.invalid::placeholder {
+    color: transparent;
+}
+
+/* Campo de Contraseña con Ojo */
+.password-group {
+    display: flex;
+    align-items: center;
+}
+
+.password-group input {
+    padding-right: 35px; /* Espacio para el ícono */
+}
+
+.toggle-password {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #777;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #333;
+}
+
+.forgot-pass {
+    margin: 2px 0 4px 0 !important;
 }
 
 
@@ -1075,10 +1227,12 @@ hr {
         font-size: 40px;
         margin-bottom: 40px;
     }
-
-    .showcase-tarjeta {
+    .showcase-contenido {
         grid-template-columns: 1fr;
         text-align: center;
+    }
+
+    .showcase-tarjeta {
         padding: 35px 25px;
     }
 

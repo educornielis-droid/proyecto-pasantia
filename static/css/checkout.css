@@ -454,25 +454,27 @@
     font-size: 15px;
 }
 
-/* -------- Botón de regresar -------- */
+/* -------- Botón de regresar (fuera de la tarjeta, sobre el fondo de la página) -------- */
 .checkout-boton-regresar {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 5;
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 50;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #FEFFFF;
-    background-color: rgba(255, 255, 255, 0.14);
-    padding: 8px 14px;
+    color: #0A3D91;
+    background-color: #FEFFFF;
+    padding: 10px 16px;
     border-radius: 20px;
     font-size: 13px;
+    font-weight: 600;
     text-decoration: none;
-    backdrop-filter: blur(4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     transition: 0.2s;
 }
 
 .checkout-boton-regresar:hover {
-    background-color: rgba(255, 255, 255, 0.26);
+    background-color: #EEF4FB;
+    transform: translateX(-2px);
 }

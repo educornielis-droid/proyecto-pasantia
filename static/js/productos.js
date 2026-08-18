@@ -116,7 +116,7 @@ function crearBotonCategoria(valorCategoria, textoVisible) {
         indiceActual = 0;
         actualizarBotonCategoriaActiva();
 
-        const tarjeta = document.getElementById("showcase-tarjeta");
+        const tarjeta = document.getElementById("showcase-contenido");
         tarjeta.classList.add("showcase-anim-salida-izq");
         setTimeout(function () {
             renderizarProductoActual();
@@ -154,7 +154,7 @@ function productosFiltrados() {
    RENDERIZAR EL PRODUCTO ACTUAL EN EL SHOWCASE
 ------------------------------------------------------------- */
 function renderizarProductoActual() {
-    const showcaseTarjeta = document.getElementById("showcase-tarjeta");
+    const showcaseTarjeta = document.getElementById("showcase-contenido");
     const showcaseIndicador = document.getElementById("showcase-indicador");
     const flechaAnterior = document.getElementById("flecha-anterior");
     const flechaSiguiente = document.getElementById("flecha-siguiente");
@@ -216,7 +216,7 @@ function moverShowcase(direccion) {
     const productos = productosFiltrados();
     if (productos.length <= 1 || animandoShowcase) return;
 
-    const tarjeta = document.getElementById("showcase-tarjeta");
+    const tarjeta = document.getElementById("showcase-contenido");
     animandoShowcase = true;
 
     // 1. El producto actual "sale" hacia el lado contrario a donde apunta la flecha
@@ -233,7 +233,7 @@ function moverShowcase(direccion) {
         // 3. Forzamos que el navegador registre esa posición inicial antes de animar
         void tarjeta.offsetWidth;
 
-        // 4. Quitamos la clase de "entrada": como .showcase-tarjeta ya tiene
+        // 4. Quitamos la clase de "entrada": como .showcase-contenido ya tiene
         //    transition definida, esto anima suavemente hasta la posición normal
         tarjeta.classList.remove("showcase-anim-entrada-der", "showcase-anim-entrada-izq");
 
@@ -244,7 +244,7 @@ function moverShowcase(direccion) {
 }
 
 function mostrarSinProductos() {
-    const showcaseTarjeta = document.getElementById("showcase-tarjeta");
+    const showcaseTarjeta = document.getElementById("showcase-contenido");
     if (showcaseTarjeta) {
         showcaseTarjeta.innerHTML = '<p class="showcase-sin-productos">No hay productos disponibles por el momento.</p>';
     }
