@@ -241,6 +241,23 @@ th, td {
     font-weight: 800;
 }
 
+.tdc p {
+  display: flex;
+  flex-direction: column; /* Apila los elementos uno sobre otro */
+  align-items: center;    /* Centra el contenido (cambia a flex-start para alinear a la izquierda) */
+}
+
+.tdc .label {
+  font-size: 0.85rem;     /* Reduce el tamaño de la etiqueta para dar jerarquía */
+  color: #FEFFFF;            /* Tono secundario opcional */
+}
+
+.tdc .monto {
+  font-weight: bold;      /* Destaca el valor numérico */
+  font-size: 1rem;
+  color: #FEFFFF;
+}
+
 .header-content {
     padding: 100px 0 100px 0;
     filter: drop-shadow(8px 8px 16px rgba(0, 0, 0, 0.3));

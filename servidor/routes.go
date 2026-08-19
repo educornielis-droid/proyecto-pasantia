@@ -1,4 +1,4 @@
-package routes
+package servidor
 
 import (
 	"net/http"
@@ -22,16 +22,16 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	ruta.GET("/app", func(contexto *gin.Context) {
 
-		// tasaUSD, err := servidor.ObtenerTasaCambioUSD()
+		tasaUSD, err := ObtenerTasaCambioUSD()
 
-		// if err != nil {
-		// 	tasaUSD = 0.0
-		// }
+		if err != nil {
+			tasaUSD = 0.0
+		}
 
 		contexto.HTML(http.StatusOK, "index.html", gin.H{
 			"Title": "Inicio - Sypago Store",
 			"Logo":  "/static/img/sypago_spinner.svg",
-			// "Tasa":  tasaUSD,
+			"Tasa":  tasaUSD,
 		})
 	})
 
@@ -44,10 +44,17 @@ func SetupRoutes(ruta *gin.Engine) {
 			return
 		}
 
+		tasaUSD, err := ObtenerTasaCambioUSD()
+
+		if err != nil {
+			tasaUSD = 0.0
+		}
+
 		contexto.HTML(http.StatusOK, "productos.html", gin.H{
 			"Title":     "Productos - Sypago Store",
 			"Productos": productos,
 			"Logo":      "/static/img/sypago_spinner.svg",
+			"Tasa":      tasaUSD,
 		})
 
 	})
