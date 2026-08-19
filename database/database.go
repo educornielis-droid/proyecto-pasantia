@@ -45,10 +45,14 @@ func CerrarDB() {
 	}
 }
 
-// 3. Función que consulta la vista y RETORNA los productos
+// 3. Función que consulta la vista y RETORNA los productos.
+// Ordenados por producto_id para que siempre aparezcan en el mismo
+// orden en el listado (no en el orden en que Postgres los devuelva).
 func ObtenerProductos() ([]Productos, error) {
-	// Usamos la conexión global DB
-	rows, err := DB.Query(context.Background(), "SELECT producto_id, nombre, descripcion, nombre_categoria, precio, stock, COALESCE(imagen_url, '') FROM v_productos ORDER BY producto_id ASC")
+	rows, err := DB.Query(
+		context.Background(),
+		"SELECT producto_id, nombre, descripcion, nombre_categoria, precio, stock, COALESCE(imagen_url, '') FROM v_productos ORDER BY producto_id ASC",
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error al consultar v_productos: %w", err)
 	}
@@ -59,13 +63,11 @@ func ObtenerProductos() ([]Productos, error) {
 	for rows.Next() {
 		var p Productos
 
-		// Escaneamos directamente a las propiedades de nuestro struct
 		err := rows.Scan(&p.ProductoID, &p.Nombre, &p.Descripcion, &p.NombreCategoria, &p.Precio, &p.Stock, &p.ImagenURL)
 		if err != nil {
 			return nil, fmt.Errorf("error al escanear fila: %w", err)
 		}
 
-		// Añadimos el producto a la lista
 		listaProductos = append(listaProductos, p)
 	}
 
@@ -78,19 +80,112 @@ func ObtenerProductos() ([]Productos, error) {
 
 // 4. Función que consulta UN SOLO producto por nombre.
 // La usa checkout.go para recalcular precio/stock/imagen de forma segura,
-// sin confiar en lo que mande el navegador.
+// sin confiar en lo que mande el navegador. También trae producto_id,
+// necesario para guardar el detalle de cada transacción y para
+// descontar stock por ID (no por nombre).
 func ObtenerProductoPorNombre(nombre string) (Productos, error) {
 	var p Productos
 
 	err := DB.QueryRow(
 		context.Background(),
-		"SELECT nombre, descripcion, nombre_categoria, precio, stock, COALESCE(imagen_url, '') FROM v_productos WHERE nombre = $1",
+		"SELECT producto_id, nombre, descripcion, nombre_categoria, precio, stock, COALESCE(imagen_url, '') FROM v_productos WHERE nombre = $1",
 		nombre,
-	).Scan(&p.Nombre, &p.Descripcion, &p.NombreCategoria, &p.Precio, &p.Stock, &p.ImagenURL)
+	).Scan(&p.ProductoID, &p.Nombre, &p.Descripcion, &p.NombreCategoria, &p.Precio, &p.Stock, &p.ImagenURL)
 
 	if err != nil {
 		return Productos{}, fmt.Errorf("producto no encontrado: %w", err)
 	}
 
 	return p, nil
+}
+
+// 5. Inserta la cabecera de una transacción de pago en la tabla
+// "transacciones". Se llama cuando ya tenemos TODOS los datos del
+// pagador (justo después de que Sypago acepta la solicitud de OTP).
+func InsertarTransaccion(
+	transaccionID string,
+	tipoDocumento string,
+	numeroDocumento string,
+	tipoCuenta string,
+	cuentaOTelefono string,
+	bancoOrigen string,
+	montoFinalUSD float64,
+	montoFinalVES float64,
+	tasaCambio float64,
+	estadoTransaccion string,
+) error {
+	_, err := DB.Exec(context.Background(), `
+		INSERT INTO transacciones
+			(transaccion_id, tipo_documento, numero_documento, tipo_cuenta,
+			 cuenta_o_telefono, banco_origen, monto_final_usd, monto_final_ves,
+			 tasa_cambio, estado_transaccion)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		transaccionID, tipoDocumento, numeroDocumento, tipoCuenta,
+		cuentaOTelefono, bancoOrigen, montoFinalUSD, montoFinalVES,
+		tasaCambio, estadoTransaccion,
+	)
+	if err != nil {
+		return fmt.Errorf("error al insertar transacción %s: %w", transaccionID, err)
+	}
+	return nil
+}
+
+// 6. Inserta una línea de detalle (un producto dentro de una transacción).
+// Se llama una vez por cada producto del carrito, junto con InsertarTransaccion.
+func InsertarDetalle(transaccionID string, productoID int, cantidadProducto int) error {
+	_, err := DB.Exec(
+		context.Background(),
+		"INSERT INTO detalles (transaccion_id, producto_id, cantidad_producto) VALUES ($1, $2, $3)",
+		transaccionID, productoID, cantidadProducto,
+	)
+	if err != nil {
+		return fmt.Errorf("error al insertar detalle de %s (producto %d): %w", transaccionID, productoID, err)
+	}
+	return nil
+}
+
+// 7. Guarda la referencia de Sypago (transaction_id) apenas la tenemos,
+// justo después de confirmar el débito con el código OTP.
+func ActualizarReferenciaSypago(transaccionID string, referenciaSypago string) error {
+	_, err := DB.Exec(
+		context.Background(),
+		"UPDATE transacciones SET referencia_sypago = $1, fecha_actualizacion = now() WHERE transaccion_id = $2",
+		referenciaSypago, transaccionID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al actualizar referencia_sypago de %s: %w", transaccionID, err)
+	}
+	return nil
+}
+
+// 8. Actualiza el estado final de una transacción (ACCP, RJCT, CANC, etc.)
+// una vez que el polling obtiene una respuesta definitiva de Sypago.
+func ActualizarEstadoTransaccion(transaccionID string, estado string, codigoRechazo string) error {
+	_, err := DB.Exec(
+		context.Background(),
+		"UPDATE transacciones SET estado_transaccion = $1, codigo_rechazo = NULLIF($2, ''), fecha_actualizacion = now() WHERE transaccion_id = $3",
+		estado, codigoRechazo, transaccionID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al actualizar estado de %s: %w", transaccionID, err)
+	}
+	return nil
+}
+
+// 9. Descuenta stock real cuando una transacción queda ACEPTADA (ACCP).
+// La condición "stock >= $1" evita que el stock quede en negativo si dos
+// compras llegaran a completarse casi al mismo tiempo.
+func DescontarStock(productoID int, cantidad int) error {
+	resultado, err := DB.Exec(
+		context.Background(),
+		"UPDATE productos SET stock = stock - $1 WHERE producto_id = $2 AND stock >= $1",
+		cantidad, productoID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al descontar stock del producto %d: %w", productoID, err)
+	}
+	if resultado.RowsAffected() == 0 {
+		return fmt.Errorf("no se pudo descontar stock del producto %d (sin stock suficiente o no existe)", productoID)
+	}
+	return nil
 }

@@ -478,3 +478,11 @@
     background-color: #EEF4FB;
     transform: translateX(-2px);
 }
+
+.checkout-total-referencia {
+    color: #C7D6F2;
+    font-size: 12px;
+    text-align: right;
+    margin-top: -20px;
+    margin-bottom: 30px;
+}

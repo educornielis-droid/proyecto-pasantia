@@ -4,18 +4,22 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"math"
 	"net/http"
-	"proyecto-golang/database"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"proyecto-golang/database"
 )
 
 /* ============================================================
-   crear la transacción a partir del carrito y
+   CHECKOUT: crear la transacción a partir del carrito y
    mostrar checkout.html con esos datos.
+   (Esto es lógica propia de la tienda, no de la API de Sypago,
+   por eso vive separado de sypagoService.go)
    ============================================================ */
 
 type productoSolicitado struct {
@@ -28,23 +32,28 @@ type solicitudCheckout struct {
 }
 
 type productoTransaccion struct {
-	Nombre    string
-	ImagenURL string
-	Cantidad  int
-	Precio    float64
-	Subtotal  float64
+	ProductoID int
+	Nombre     string
+	ImagenURL  string
+	Cantidad   int
+	Precio     float64
+	Subtotal   float64
 }
 
 type transaccion struct {
 	ID          string
 	Productos   []productoTransaccion
-	Total       float64
+	TotalUSD    float64
+	TotalVES    float64
+	TasaCambio  float64
 	CreadaEn    time.Time
 	DatosDebito *datosDebitoPendiente
 	Pago        *resultadoPago // se llena cuando Sypago acepta la solicitud de débito
 }
 
 // Resultado que devuelve Sypago al aceptar la solicitud de débito con OTP.
+// El estado inicial es "PEND" (pendiente) - el estado final se sabrá con
+// el polling que se implementará en la próxima sesión.
 type resultadoPago struct {
 	TransactionID   string
 	OperationSecret string
@@ -59,6 +68,11 @@ type datosDebitoPendiente struct {
 	DocumentInfo   documentoInfo
 	DebitorAccount cuentaSypago
 }
+
+/* ------------------------------------------------------------
+   ALMACENAMIENTO TEMPORAL EN MEMORIA
+   (mañana esto se reemplaza por una tabla en PostgreSQL)
+------------------------------------------------------------- */
 
 var (
 	almacenTransacciones = make(map[string]transaccion)
@@ -110,9 +124,14 @@ func guardarResultadoPago(idTransaccion string, resultado resultadoPago) bool {
 	return true
 }
 
+/* ------------------------------------------------------------
+   Checkout registra las 2 rutas de este archivo, siguiendo el
+   mismo patrón que TdC() en sypagoService.go.
+------------------------------------------------------------- */
+
 func Checkout(ruta *gin.Engine) {
 
-	// el carrito inicia la transacción
+	// PASO 1: el carrito inicia la transacción
 	ruta.POST("/api/checkout/iniciar", func(contexto *gin.Context) {
 		var solicitud solicitudCheckout
 
@@ -135,7 +154,8 @@ func Checkout(ruta *gin.Engine) {
 				return
 			}
 
-			// Recalculamos SIEMPRE desde la BD, nunca confiamos en un precio que pudiera venir del navegador.
+			// Recalculamos SIEMPRE desde la BD, nunca confiamos en un
+			// precio que pudiera venir del navegador.
 			productoBD, err := database.ObtenerProductoPorNombre(itemSolicitado.Nombre)
 			if err != nil {
 				contexto.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Producto no encontrado: %s", itemSolicitado.Nombre)})
@@ -151,11 +171,12 @@ func Checkout(ruta *gin.Engine) {
 			montoTotal += subtotal
 
 			productosTransaccion = append(productosTransaccion, productoTransaccion{
-				Nombre:    productoBD.Nombre,
-				ImagenURL: productoBD.ImagenURL,
-				Cantidad:  itemSolicitado.Cantidad,
-				Precio:    productoBD.Precio,
-				Subtotal:  subtotal,
+				ProductoID: productoBD.ProductoID,
+				Nombre:     productoBD.Nombre,
+				ImagenURL:  productoBD.ImagenURL,
+				Cantidad:   itemSolicitado.Cantidad,
+				Precio:     productoBD.Precio,
+				Subtotal:   subtotal,
 			})
 		}
 
@@ -164,6 +185,23 @@ func Checkout(ruta *gin.Engine) {
 			return
 		}
 
+		// Salvaguarda: sumar varios float64 puede dejar arrastres de punto
+		// flotante invisibles (ej. 30.499999999999996). Redondeamos antes
+		// de seguir usando este valor para cualquier cálculo o envío.
+		montoTotal = math.Round(montoTotal*100) / 100
+
+		// La tienda maneja precios en USD, pero Sypago cobra en VES.
+		// Consultamos la tasa oficial (misma lógica que expone /api/tasa)
+		// y calculamos el monto real que se va a debitar.
+		tasaUSD, err := obtenerTasaCambioUSD()
+		if err != nil {
+			fmt.Println("[Checkout] Error al obtener la tasa de cambio:", err)
+			contexto.JSON(http.StatusBadGateway, gin.H{"error": "No se pudo obtener la tasa de cambio actual"})
+			return
+		}
+
+		montoVES := math.Round(montoTotal*tasaUSD*100) / 100
+
 		idTransaccion, err := generarIDTransaccion()
 		if err != nil {
 			contexto.JSON(http.StatusInternalServerError, gin.H{"error": "Error al generar la transacción"})
@@ -171,10 +209,12 @@ func Checkout(ruta *gin.Engine) {
 		}
 
 		nuevaTransaccion := transaccion{
-			ID:        idTransaccion,
-			Productos: productosTransaccion,
-			Total:     montoTotal,
-			CreadaEn:  time.Now(),
+			ID:         idTransaccion,
+			Productos:  productosTransaccion,
+			TotalUSD:   montoTotal,
+			TotalVES:   montoVES,
+			TasaCambio: tasaUSD,
+			CreadaEn:   time.Now(),
 		}
 
 		guardarTransaccion(nuevaTransaccion)
@@ -184,7 +224,7 @@ func Checkout(ruta *gin.Engine) {
 		})
 	})
 
-	// mostrar checkout.html con los datos guardados
+	// PASO 2: mostrar checkout.html con los datos guardados
 	ruta.GET("/checkout/:idTransaccion", func(contexto *gin.Context) {
 		idTransaccion := contexto.Param("idTransaccion")
 
@@ -199,15 +239,16 @@ func Checkout(ruta *gin.Engine) {
 			"NombreComercio": "Sypago Store",
 			"Rif":            "J-3090842500",
 			"Productos":      transaccionEncontrada.Productos,
-			"Total":          transaccionEncontrada.Total,
+			"TotalVES":       transaccionEncontrada.TotalVES,
+			"TotalUSD":       transaccionEncontrada.TotalUSD,
+			"TasaCambio":     transaccionEncontrada.TasaCambio,
 			"IDTransaccion":  transaccionEncontrada.ID,
-			"Logo":           "/static/img/sypago_spinner.svg",
 		})
 	})
 }
 
 /* ------------------------------------------------------------
-   ID único de 12 caracteres hexadecimales
+   UTILIDAD: ID único de 12 caracteres hexadecimales
    (la usan tanto checkout.go como sypagoService.go)
 ------------------------------------------------------------- */
 

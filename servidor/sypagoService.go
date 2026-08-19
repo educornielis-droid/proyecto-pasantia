@@ -7,14 +7,24 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"proyecto-golang/database"
 )
 
+/* ============================================================
+   SYPAGO SERVICE
+   Todo lo relacionado con la API de Sypago vive en este único
+   archivo: tasa de cambio, autenticación (token), solicitud de
+   OTP y confirmación de débito con OTP.
+   ============================================================ */
+
 /* ------------------------------------------------------------
-   1. TASA DE CAMBIO
+   1. TASA DE CAMBIO (tal cual ya la tenías funcionando)
 ------------------------------------------------------------- */
 
 type TasaCambio struct {
@@ -26,29 +36,11 @@ type TasaCambio struct {
 
 func TdC(ruta *gin.Engine) {
 	ruta.GET("/api/tasa", func(contexto *gin.Context) {
-		url := os.Getenv("SYPAGO_API_BASE_URL") + "/api/v1/bank/bcv/rate?use_date_rate=true"
-
-		respuesta, err := http.Get(url)
+		listaTasas, err := obtenerTasasCambio()
 		if err != nil {
+			fmt.Println("[Sypago Tasa] Error:", err)
 			contexto.JSON(http.StatusBadGateway, gin.H{
 				"error": "Respuesta al comunicar con la API externa",
-			})
-			return
-		}
-		defer respuesta.Body.Close()
-
-		if respuesta.StatusCode != http.StatusOK {
-			contexto.JSON(respuesta.StatusCode, gin.H{
-				"error": "Respuesta no exitosa de la API externa",
-			})
-			return
-		}
-
-		var listaTasas []TasaCambio
-
-		if err := json.NewDecoder(respuesta.Body).Decode(&listaTasas); err != nil {
-			contexto.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Error al decodificar la respuesta",
 			})
 			return
 		}
@@ -60,8 +52,51 @@ func TdC(ruta *gin.Engine) {
 	})
 }
 
+// Hace la llamada real a Sypago y devuelve todas las tasas (USD, EUR, etc.)
+// La usa tanto el endpoint público /api/tasa como obtenerTasaCambioUSD()
+// internamente, para no duplicar la misma lógica de fetch dos veces.
+func obtenerTasasCambio() ([]TasaCambio, error) {
+	url := os.Getenv("SYPAGO_API_BASE_URL") + "/api/v1/bank/bcv/rate?use_date_rate=true"
+
+	respuesta, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("error al comunicar con la API externa: %w", err)
+	}
+	defer respuesta.Body.Close()
+
+	if respuesta.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("respuesta no exitosa de la API externa (status %d)", respuesta.StatusCode)
+	}
+
+	var listaTasas []TasaCambio
+	if err := json.NewDecoder(respuesta.Body).Decode(&listaTasas); err != nil {
+		return nil, fmt.Errorf("error al decodificar la respuesta: %w", err)
+	}
+
+	return listaTasas, nil
+}
+
+// Usada internamente por el checkout para convertir el total en USD de la
+// tienda al monto real en VES que se le debita al cliente vía Sypago.
+func obtenerTasaCambioUSD() (float64, error) {
+	listaTasas, err := obtenerTasasCambio()
+	if err != nil {
+		return 0, err
+	}
+
+	for _, tasa := range listaTasas {
+		if strings.EqualFold(tasa.Codigo, "USD") {
+			return tasa.Tasa, nil
+		}
+	}
+
+	return 0, fmt.Errorf("no se encontró la tasa USD en la respuesta de Sypago")
+}
+
 /* ------------------------------------------------------------
    2. AUTENTICACIÓN: GESTOR DE TOKEN
+   (nadie fuera de este archivo llama a esto directamente,
+   todas las funciones de aquí abajo usan obtenerTokenValido())
 ------------------------------------------------------------- */
 
 type gestorTokenSypago struct {
@@ -72,6 +107,8 @@ type gestorTokenSypago struct {
 
 var gestorToken = &gestorTokenSypago{}
 
+// Margen de seguridad: refrescamos el token un poco ANTES de que
+// venza de verdad, para nunca usar uno que expire a mitad de una petición.
 const margenSeguridadToken = 60 * time.Second
 
 func obtenerTokenValido() (string, error) {
@@ -189,6 +226,9 @@ type solicitudOTPDesdeFrontend struct {
 	NumeroDocumento string `json:"numero_documento"`
 }
 
+// Nombre genérico usado en receiving_user.name, ya que el formulario
+// no le pide el nombre al pagador. Si más adelante agregas login de
+// usuarios, este es el lugar para reemplazarlo por el nombre real.
 const nombreGenericoPagador = "Cliente Sypago Store"
 
 // SolicitarOTP registra la ruta que pide el código OTP a Sypago.
@@ -242,7 +282,7 @@ func SolicitarOTP(ruta *gin.Engine) {
 				Number:   datosFormulario.NumeroCuenta,
 			},
 			Amount: montoSypago{
-				Amt:      transaccionActual.Total, // monto real, calculado por el servidor
+				Amt:      transaccionActual.TotalVES, // monto REAL en VES, ya convertido con la tasa oficial
 				Currency: "VES",
 			},
 		}
@@ -266,6 +306,34 @@ func SolicitarOTP(ruta *gin.Engine) {
 				Number:   datosFormulario.NumeroCuenta,
 			},
 		})
+
+		// Este es el primer momento en que tenemos TODOS los datos que
+		// exige la tabla "transacciones" (documento, cuenta, banco, monto,
+		// tasa) reunidos a la vez, así que aquí es donde queda la orden
+		// guardada de verdad en PostgreSQL. Si el guardado falla, no
+		// interrumpimos al usuario (Sypago ya aceptó su solicitud), pero
+		// sí lo dejamos bien visible en consola para revisarlo.
+		errorGuardado := database.InsertarTransaccion(
+			idTransaccion,
+			datosFormulario.TipoDocumento,
+			datosFormulario.NumeroDocumento,
+			datosFormulario.TipoCuenta,
+			datosFormulario.NumeroCuenta,
+			datosFormulario.CodigoBanco,
+			transaccionActual.TotalUSD,
+			transaccionActual.TotalVES,
+			transaccionActual.TasaCambio,
+			"PEND",
+		)
+		if errorGuardado != nil {
+			fmt.Println("[BD] Error al guardar la transacción", idTransaccion, ":", errorGuardado)
+		} else {
+			for _, item := range transaccionActual.Productos {
+				if errorDetalle := database.InsertarDetalle(idTransaccion, item.ProductoID, item.Cantidad); errorDetalle != nil {
+					fmt.Println("[BD] Error al guardar detalle de", idTransaccion, ":", errorDetalle)
+				}
+			}
+		}
 
 		contexto.JSON(http.StatusOK, gin.H{
 			"mensaje": "Código OTP solicitado. Revisa SMS, correo o tu app bancaria.",
@@ -308,13 +376,18 @@ type solicitudConfirmarOTPDesdeFrontend struct {
 	Otp string `json:"otp"`
 }
 
-// Tipado real de la respuesta de éxito de /api/v1/transaction/otp
+// Tipado real de la respuesta de éxito de /api/v1/transaction/otp,
+// según la documentación: { "transaction_id": "...", "operation_secret": "..." }
 type respuestaDebitoOTP struct {
 	TransactionID   string `json:"transaction_id"`
 	OperationSecret string `json:"operation_secret"`
 }
 
-// Confirmacion de que Sypago aceptó procesar la solicitud de débito.
+// ConfirmarOTP registra la ruta que envía el código que el usuario
+// recibió. IMPORTANTE: esto NO confirma que el pago fue exitoso —
+// solo confirma que Sypago aceptó procesar la solicitud de débito.
+// El resultado real (aceptado/rechazado) se conoce con el polling
+// del endpoint de estado, más abajo en este archivo.
 func ConfirmarOTP(ruta *gin.Engine) {
 	ruta.POST("/api/checkout/:idTransaccion/confirmar-otp", func(contexto *gin.Context) {
 		idTransaccion := contexto.Param("idTransaccion")
@@ -358,7 +431,7 @@ func ConfirmarOTP(ruta *gin.Engine) {
 				Number:   os.Getenv("SYPAGO_MERCHANT_ACCOUNT_NUMBER"),
 			},
 			Amount: montoSypago{
-				Amt:      transaccionActual.Total,
+				Amt:      transaccionActual.TotalVES, // mismo monto real en VES usado al pedir el OTP
 				Currency: "VES",
 			},
 			Concept: "Sypago Store - Orden " + idTransaccion,
@@ -375,12 +448,19 @@ func ConfirmarOTP(ruta *gin.Engine) {
 
 		respuestaSypago, err := llamarConfirmarDebitoOTPSypago(token, cuerpoSypago)
 		if err != nil {
+			// Si Sypago rechaza la solicitud EN ESTE PRIMER PASO (ej. OTP con
+			// formato inválido, cuenta bloqueada de forma evidente, etc.),
+			// el error llega aquí directo, sin necesidad de polling.
 			fmt.Println("[Sypago Confirmar OTP] Error:", err)
 			contexto.JSON(http.StatusBadGateway, gin.H{"error": "No se pudo enviar la solicitud de pago al proveedor"})
 			return
 		}
 
-		// guardar la orden en PostgreSQL con estado "PEND" aquí.
+		// Ya tenemos el transaction_id real de Sypago para esta transacción:
+		// lo guardamos en la fila que insertamos en SolicitarOTP.
+		if errorReferencia := database.ActualizarReferenciaSypago(idTransaccion, respuestaSypago.TransactionID); errorReferencia != nil {
+			fmt.Println("[BD] Error al guardar referencia_sypago de", idTransaccion, ":", errorReferencia)
+		}
 
 		guardarResultadoPago(idTransaccion, resultadoPago{
 			TransactionID:   respuestaSypago.TransactionID,
@@ -460,7 +540,8 @@ func esEstadoDefinitivo(estado string) bool {
 	}
 }
 
-// Tabla de códigos de rechazo de Sypago, para poder explicarle al usuario por qué falló un pago.
+// Tabla de códigos de rechazo de Sypago, para poder explicarle al
+// desarrollador (por consola) o al usuario por qué falló un pago.
 var descripcionesCodigoRechazo = map[string]string{
 	"AB01":  "Proceso cancelado debido al tiempo de espera.",
 	"AB07":  "El agente del mensaje no está en línea.",
@@ -549,6 +630,8 @@ func EstadoTransaccion(ruta *gin.Engine) {
 			return
 		}
 
+		estadoAnterior := transaccionActual.Pago.Estado // antes de sobrescribirlo, para saber si es la PRIMERA vez que llega a ACCP
+
 		guardarResultadoPago(idTransaccion, resultadoPago{
 			TransactionID:   transaccionActual.Pago.TransactionID,
 			OperationSecret: transaccionActual.Pago.OperationSecret,
@@ -558,6 +641,26 @@ func EstadoTransaccion(ruta *gin.Engine) {
 		descripcion := descripcionesCodigoRechazo[codigoRechazo]
 		if descripcion != "" {
 			fmt.Println("[Sypago Estado] Código:", codigoRechazo, "-", descripcion)
+		}
+
+		// Solo actualizamos/descontamos cuando el estado ya es definitivo -
+		// mientras siga en PEND/PROC no hay nada que guardar todavía.
+		if esEstadoDefinitivo(nuevoEstado) {
+			if errorEstado := database.ActualizarEstadoTransaccion(idTransaccion, nuevoEstado, codigoRechazo); errorEstado != nil {
+				fmt.Println("[BD] Error al actualizar estado de", idTransaccion, ":", errorEstado)
+			}
+
+			// Descontamos stock SOLO la primera vez que vemos ACCP para esta
+			// transacción (si el polling la vuelve a consultar después de
+			// eso, ya se corta antes por el "if esEstadoDefinitivo" de arriba,
+			// pero esta doble condición es una segunda barrera explícita).
+			if nuevoEstado == "ACCP" && estadoAnterior != "ACCP" {
+				for _, item := range transaccionActual.Productos {
+					if errorStock := database.DescontarStock(item.ProductoID, item.Cantidad); errorStock != nil {
+						fmt.Println("[BD] Error al descontar stock de", item.Nombre, ":", errorStock)
+					}
+				}
+			}
 		}
 
 		contexto.JSON(http.StatusOK, gin.H{
@@ -571,7 +674,14 @@ func EstadoTransaccion(ruta *gin.Engine) {
 
 // Consulta el estado real de una transacción en Sypago.
 // GET /api/v1/transaction/{id}
-
+//
+// NOTA: la documentación no especifica los nombres EXACTOS de los
+// campos de la respuesta, solo los valores posibles (PEND, PROC,
+// ACCP, RJCT, CANC) y que existe un campo "RejectedCode". Por eso
+// esta función prueba varios nombres comunes y además imprime la
+// respuesta cruda en consola - en cuanto veamos una respuesta real,
+// ajustamos extraerPrimerCampoString() para que apunte directo al
+// nombre correcto.
 func consultarEstadoEnSypago(token string, transactionID string) (estado string, codigoRechazo string, err error) {
 	urlCompleta := os.Getenv("SYPAGO_API_BASE_URL") + "/api/v1/transaction/" + transactionID
 
@@ -658,14 +768,20 @@ func llamarSypagoConToken(token string, rutaEndpoint string, cuerpo interface{})
 		return nil, fmt.Errorf("error al leer la respuesta de Sypago: %w", err)
 	}
 
+	// Útil mientras terminamos de mapear todas las formas de respuesta de Sypago
 	fmt.Println("[Sypago] Respuesta cruda de", rutaEndpoint, ":", string(cuerpoRespuesta))
 
 	if respuesta.StatusCode < 200 || respuesta.StatusCode >= 300 {
 		return nil, fmt.Errorf("Sypago respondió %d: %s", respuesta.StatusCode, string(cuerpoRespuesta))
 	}
 
+	// Sypago no siempre responde con un objeto {...}; a veces es un string
+	// plano, un booleano, etc. Usamos interface{} para aceptar cualquier
+	// forma válida de JSON en vez de forzar un objeto.
 	var datosRespuesta interface{}
 	if err := json.Unmarshal(cuerpoRespuesta, &datosRespuesta); err != nil {
+		// Si ni siquiera es JSON válido, devolvemos el texto tal cual
+		// en vez de fallar por completo (la petición SÍ fue exitosa).
 		return string(cuerpoRespuesta), nil
 	}
 

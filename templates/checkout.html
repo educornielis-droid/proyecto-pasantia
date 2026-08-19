@@ -6,7 +6,6 @@
         <title>{{ .Title }}</title>
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="stylesheet" href="/static/css/checkout.css">
-        <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
     </head>
     <body class="checkout-body">
 
@@ -40,8 +39,11 @@
 
                 <div class="checkout-total-card">
                     <span>Total a Pagar:</span>
-                    <span class="checkout-total-monto" id="checkout-total-monto">${{ printf "%.2f" .Total }}</span>
+                    <span class="checkout-total-monto" id="checkout-total-monto">Bs. {{ printf "%.2f" .TotalVES }}</span>
                 </div>
+                <p class="checkout-total-referencia">
+                    Equivale a ${{ printf "%.2f" .TotalUSD }} USD · Tasa: {{ printf "%.2f" .TasaCambio }} Bs/$
+                </p>
 
                 <div class="checkout-footer-izquierdo">
                     <a href="#">Términos y Condiciones</a>
@@ -86,6 +88,9 @@
                             <option value="0190">Banco Nacional de Crédito (0190)</option>
                             <option value="0191">Banco Nacional de Crédito BNC (0191)</option>
                         </select>
+                        <p class="checkout-nota-campo">
+                            Verifica esta lista de códigos contra la documentación oficial de Sypago antes de producción.
+                        </p>
                     </div>
 
                     <div class="checkout-tabs-metodo" id="tabs-tipo-cuenta">
