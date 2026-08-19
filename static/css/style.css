@@ -54,6 +54,51 @@ body {
     background-color: rgb(102, 176, 245);
 }
 
+
+
+
+/* Layout Principal del Header */
+.menu.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribuye: Izquierda, Centro, Derecha */
+  gap: 1rem;
+}
+
+
+
+/* 2. Centro */
+.navbar {
+  margin: 0 auto; /* Asegura el centrado perfecto */
+}
+
+.navbar ul {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. Derecha (Agrupado pegadito con margen) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem; /* Margen entre carrito, usuario y tasa */
+  flex-shrink: 0;
+}
+
+.carrito-wrapper {
+  position: relative; /* Para desplegar el menú flotante del carrito */
+}
+
+
+
+
+
+
+
+
 .menu {
     position: fixed;
     top: 10px;
@@ -77,6 +122,7 @@ body {
     color: white;
     text-transform: uppercase;
     font-weight: 800;
+    flex-shrink: 0;
 }
 
 .menu .navbar ul li {
@@ -1065,6 +1111,11 @@ hr {
         position: relative;
     }
 
+    .menu.container {
+        padding: 10px 20px;
+        position: relative; /* Permite posicionar el menú desplegable */
+    }
+
     .menu-inicio {
         width: 100%;
         display: flex;
@@ -1095,17 +1146,25 @@ hr {
 
     .menu .navbar {
         position: absolute;
-        top: 100%;       
+        top: 100%;
         left: 0;
-        width: 100%;    
-        background-color: #181818; 
-        display: none;   
-        z-index: 1000;  
+        right: 0;
+        background-color: rgb(0, 100, 185);
+        background: linear-gradient(to right, rgb(0, 65, 125), rgb(0, 110, 210));
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: none; /* Oculto por defecto */
+        width: 100%;
+        z-index: 1000;
     }
 
     .menu .navbar ul {
-        padding: 0;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
         margin: 0;
+        padding: 1.5rem 0;
     }
 
     .menu .navbar ul li {
@@ -1121,6 +1180,10 @@ hr {
 
     #menu:checked ~ .navbar {
         display: block;
+    }
+    
+    .menu.container > div:has(#logo-carrito) {
+        margin-left: auto; /* Empuja el carrito y lo que le sigue a la derecha */
     }
 
     .logo {
