@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -16,6 +17,24 @@ type Productos struct {
 	Precio          float64 `json:"precio"`
 	Stock           int     `json:"stock"`
 	ImagenURL       string  `json:"imagen_url"`
+}
+
+// Struct de Transaccion
+type Transacciones struct {
+	TransaccionID      int       `json:"transaccion_id"`
+	TipoDocumento      string    `json:"tipo_documento"`
+	NumeroDocumento    int       `json:"numero_documento"`
+	TipoCuenta         string    `json:"tipo_cuenta"`
+	CuentaOTelefono    int       `json:"cuenta_o_telefono"`
+	BancoOrigen        string    `json:"banco_origen"`
+	MontoFinalUSD      float64   `json:"monto_final_usd"`
+	MontoFinalVES      float64   `json:"monto_final_ves"`
+	TasaCambio         float64   `json:"tasa_cambio"`
+	EstadoTransaccion  string    `json:"estado_transaccion"`
+	ReferenciaSypago   string    `json:"referencia_sypago"`
+	FechaCreacion      time.Time `json:"fecha_creacion"`
+	FechaActualizacion time.Time `json:"fecha_actualizacion"`
+	CodigoRechazo      string    `json:"codigo_rechazo"`
 }
 
 // Variable global del paquete github.com/jackc/pgx/v5 para reutilizar la conexión
@@ -188,4 +207,34 @@ func DescontarStock(productoID int, cantidad int) error {
 		return fmt.Errorf("no se pudo descontar stock del producto %d (sin stock suficiente o no existe)", productoID)
 	}
 	return nil
+}
+
+func ObtenerTransaccionBD() ([]Transacciones, error) {
+	rows, err := DB.Query(
+		context.Background(),
+		"SELECT transaccion_id, tipo_documento, numero_documento, tipo_cuenta, cuenta_o_telefono, banco_origen, monto_final_usd, monto_final_ves, tasa_cambio, estado_transaccion, referencia_sypago, fecha_creacion, fecha_actualizacion, COALESCE(codigo_rechazo, '') FROM transacciones ORDER BY fecha_creacion DESC",
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error al consultar v_productos: %w", err)
+	}
+	defer rows.Close()
+
+	var listaTransacciones []Transacciones
+
+	for rows.Next() {
+		var t Transacciones
+
+		err := rows.Scan(&t.TransaccionID, &t.TipoDocumento, &t.NumeroDocumento, &t.TipoCuenta, &t.CuentaOTelefono, &t.BancoOrigen, &t.MontoFinalUSD, &t.MontoFinalVES, &t.TasaCambio, &t.EstadoTransaccion, &t.ReferenciaSypago, &t.FechaCreacion, &t.FechaActualizacion, &t.CodigoRechazo)
+		if err != nil {
+			return nil, fmt.Errorf("error al escanear fila: %w", err)
+		}
+
+		listaTransacciones = append(listaTransacciones, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error durante la iteración: %w", err)
+	}
+
+	return listaTransacciones, nil
 }

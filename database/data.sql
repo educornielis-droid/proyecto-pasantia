@@ -373,3 +373,7 @@ CREATE TABLE detalles (
 -- Índice para consultar rápido "todas las transacciones de un producto" o "el detalle de una transacción" sin escanear toda la tabla.
 CREATE INDEX idx_detalles_transaccion ON detalles(transaccion_id);
 CREATE INDEX idx_detalles_producto ON detalles(producto_id);
+
+UPDATE productos 
+SET stock = 20
+WHERE producto_id = 1;

@@ -77,7 +77,8 @@ function leerProductosDesdeElDOM() {
             descripcion: nodo.dataset.descripcion,
             precio: parseFloat(nodo.dataset.precio),
             imagen: nodo.dataset.imagen || "",
-            categoria: nodo.dataset.categoria || "Sin categoría"
+            categoria: nodo.dataset.categoria || "Sin categoría",
+            stock: parseInt(nodo.dataset.stock, 10) || 0
         };
     });
 }
@@ -184,6 +185,7 @@ function renderizarProductoActual() {
         <div class="showcase-izquierda">
             <h3 class="showcase-nombre">${escaparTexto(producto.nombre)}</h3>
             <p class="showcase-descripcion">${escaparTexto(producto.descripcion)}</p>
+            <p class="showcase-stock">Unidades disponibles: ${producto.stock}</p>
             <a href="#" class="agregar-carrito btn-3 showcase-boton"
                data-nombre="${escaparAtributo(producto.nombre)}"
                data-precio="${producto.precio}"

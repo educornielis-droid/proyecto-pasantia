@@ -161,6 +161,29 @@ function agregarProductoAlCarrito(nombreProducto, precioProducto, cantidadAgrega
 
     guardarCarritoEnStorage(carritoActual);
     renderizarCarrito();
+    mostrarAvisoAgregado();
+}
+
+/**
+ * Muestra un toast pequeño y no intrusivo, abajo a la derecha,
+ * confirmando que el producto se agregó. Protegido por si en
+ * alguna página no se cargó el script de SweetAlert2.
+ */
+function mostrarAvisoAgregado() {
+    if (typeof Swal === "undefined") {
+        console.warn("[Carrito] SweetAlert2 no está cargado en esta página, se omite el aviso visual.");
+        return;
+    }
+
+    Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "success",
+        title: "Agregado al carrito",
+        showConfirmButton: false,
+        timer: 1800,
+        timerProgressBar: true
+    });
 }
 
 function eliminarProductoDelCarrito(nombreProducto) {
@@ -223,6 +246,7 @@ function renderizarCarrito() {
     const carritoActual = obtenerCarritoDesdeStorage();
 
     cuerpoTablaCarrito.innerHTML = "";
+    actualizarContadorCarrito(carritoActual);
 
     if (carritoActual.length === 0) {
         mensajeCarritoVacio.style.display = "block";
@@ -240,6 +264,28 @@ function renderizarCarrito() {
 
     const totalCarrito = calcularTotalCarrito(carritoActual);
     elementoTotalMonto.textContent = "$" + totalCarrito.toFixed(2);
+}
+
+/**
+ * Muestra la cantidad de PRODUCTOS DISTINTOS en el carrito (no la suma
+ * de unidades). 1 camisa + 90 unidades de otra = 2, no 91. Si el
+ * carrito está vacío, se oculta el número por completo.
+ */
+function actualizarContadorCarrito(carrito) {
+    const contadorCarrito = document.getElementById("carrito-contador");
+    if (!contadorCarrito) {
+        return; // esta página no tiene el badge en su HTML, no hay nada que hacer
+    }
+
+    const cantidadProductosDistintos = carrito.length;
+
+    if (cantidadProductosDistintos > 0) {
+        contadorCarrito.textContent = cantidadProductosDistintos;
+        contadorCarrito.style.display = "flex";
+    } else {
+        contadorCarrito.style.display = "none";
+        contadorCarrito.textContent = "";
+    }
 }
 
 function crearFilaProducto(producto) {

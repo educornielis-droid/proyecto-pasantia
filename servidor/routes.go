@@ -73,6 +73,23 @@ func SetupRoutes(ruta *gin.Engine) {
 		})
 	})
 
+	ruta.GET("/app/admin/ordenes", func(contexto *gin.Context) {
+		transacciones, err := database.ObtenerTransaccionBD()
+
+		if err != nil {
+			contexto.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error()})
+			return
+		}
+
+		contexto.HTML(http.StatusOK, "transacciones.html", gin.H{
+			"Title":         "Panel administrativo - Sypago Store",
+			"Transacciones": transacciones,
+			"Logo":          "/static/img/sypago_spinner.svg",
+		})
+
+	})
+
 	ruta.GET("/api/v1", func(contexto *gin.Context) {
 		productos, err := database.ObtenerProductos()
 		if err != nil {

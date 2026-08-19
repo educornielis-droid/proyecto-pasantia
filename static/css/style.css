@@ -669,7 +669,7 @@ hr {
     color: #747B8F;
 }
 
-
+/* -------- Transición al cambiar de producto (flechas/categoría) -------- */
 .showcase-anim-salida-izq {
     transform: translateX(-30px);
     opacity: 0;
@@ -692,7 +692,31 @@ hr {
     transition: none;
 }
 
+/* -------- Stock disponible en el showcase -------- */
+.showcase-stock {
+    font-size: 13px;
+    color: #747B8F;
+}
 
+/* -------- Contador de productos distintos sobre el ícono del carrito -------- */
+.carrito-contador {
+    display: none;
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background-color: #ff3b3b;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    font-family: 'Poppins', sans-serif;
+}
 
 /*Login del admin */
 .bodyAdmin-login {
