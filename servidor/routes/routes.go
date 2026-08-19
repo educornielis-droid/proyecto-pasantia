@@ -22,23 +22,17 @@ func SetupRoutes(ruta *gin.Engine) {
 
 	ruta.GET("/app", func(contexto *gin.Context) {
 
-		var segments []string
-		// endpoint separado por segmentos
-		if len(segments) < 1 {
-			contexto.HTML(http.StatusOK, "index.html", gin.H{
-				"Title": "Inicio - Sypago Store",
-				"Logo":  "/static/img/sypago_spinner.svg",
-			})
-		} else if segments[0] == "productos" {
+		// tasaUSD, err := servidor.ObtenerTasaCambioUSD()
 
-		} else if segments[0] == "registro" {
+		// if err != nil {
+		// 	tasaUSD = 0.0
+		// }
 
-		} else if segments[0] == "contactos" {
-
-		} else {
-			contexto.HTML(http.StatusNotFound, "404.html", nil)
-		}
-
+		contexto.HTML(http.StatusOK, "index.html", gin.H{
+			"Title": "Inicio - Sypago Store",
+			"Logo":  "/static/img/sypago_spinner.svg",
+			// "Tasa":  tasaUSD,
+		})
 	})
 
 	ruta.GET("/app/productos", func(contexto *gin.Context) {

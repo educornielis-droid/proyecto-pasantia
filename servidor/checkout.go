@@ -193,7 +193,7 @@ func Checkout(ruta *gin.Engine) {
 		// La tienda maneja precios en USD, pero Sypago cobra en VES.
 		// Consultamos la tasa oficial (misma lógica que expone /api/tasa)
 		// y calculamos el monto real que se va a debitar.
-		tasaUSD, err := obtenerTasaCambioUSD()
+		tasaUSD, err := ObtenerTasaCambioUSD()
 		if err != nil {
 			fmt.Println("[Checkout] Error al obtener la tasa de cambio:", err)
 			contexto.JSON(http.StatusBadGateway, gin.H{"error": "No se pudo obtener la tasa de cambio actual"})

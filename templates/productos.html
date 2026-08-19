@@ -108,7 +108,8 @@
                      data-descripcion="{{ .Descripcion }}"
                      data-precio="{{ printf "%.2f" .Precio }}"
                      data-imagen="{{ .ImagenURL }}"
-                     data-categoria="{{ .NombreCategoria }}">
+                     data-categoria="{{ .NombreCategoria }}"
+                     data-stock="{{ .Stock }}">
                 </div>
                 {{ else }}
                 <p class="sin-productos-dato">No hay productos disponibles por el momento.</p>

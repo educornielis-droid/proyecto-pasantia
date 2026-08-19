@@ -24,7 +24,7 @@ import (
    ============================================================ */
 
 /* ------------------------------------------------------------
-   1. TASA DE CAMBIO (tal cual ya la tenías funcionando)
+   1. TASA DE CAMBIO
 ------------------------------------------------------------- */
 
 type TasaCambio struct {
@@ -78,7 +78,7 @@ func obtenerTasasCambio() ([]TasaCambio, error) {
 
 // Usada internamente por el checkout para convertir el total en USD de la
 // tienda al monto real en VES que se le debita al cliente vía Sypago.
-func obtenerTasaCambioUSD() (float64, error) {
+func ObtenerTasaCambioUSD() (float64, error) {
 	listaTasas, err := obtenerTasasCambio()
 	if err != nil {
 		return 0, err
