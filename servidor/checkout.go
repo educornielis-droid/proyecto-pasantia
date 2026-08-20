@@ -237,6 +237,7 @@ func Checkout(ruta *gin.Engine) {
 		contexto.HTML(http.StatusOK, "checkout.html", gin.H{
 			"Title":          "Checkout - Sypago Store",
 			"NombreComercio": "Sypago Store",
+			"Logo":           "/static/img/sypago_spinner.svg",
 			"Rif":            "J-3090842500",
 			"Productos":      transaccionEncontrada.Productos,
 			"TotalVES":       transaccionEncontrada.TotalVES,
