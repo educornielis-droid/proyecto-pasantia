@@ -22,6 +22,8 @@ let contenedorAccionesCarrito;
 let elementoTotalMonto;
 let botonVaciarCarrito;
 let botonPagarCarrito;
+let iconoCarrito;
+let contenedorCarrito;
 
 /* ------------------------------------------------------------
    2. INICIALIZACION
@@ -40,6 +42,26 @@ function inicializarCarrito() {
         elementoTotalMonto = document.getElementById("total-monto");
         botonVaciarCarrito = document.getElementById("vaciar-carrito");
         botonPagarCarrito = document.getElementById("pagar-carrito");
+        iconoCarrito = document.getElementById("logo-carrito");
+        contenedorCarrito = document.getElementById("carrito");
+
+        // Abrir/cerrar el carrito con clic (ya no con :hover). Así el
+        // contenido se queda visible mientras el usuario mueve el mouse
+        // adentro para hacer scroll o cambiar cantidades.
+        if (iconoCarrito && contenedorCarrito) {
+            iconoCarrito.addEventListener("click", function (evento) {
+                evento.preventDefault();
+                evento.stopPropagation();
+                contenedorCarrito.classList.toggle("carrito-abierto");
+            });
+
+            document.addEventListener("click", function (evento) {
+                const clickFueraDelCarrito = !contenedorCarrito.contains(evento.target) && evento.target !== iconoCarrito;
+                if (clickFueraDelCarrito) {
+                    contenedorCarrito.classList.remove("carrito-abierto");
+                }
+            });
+        }
 
         if (!cuerpoTablaCarrito || !mensajeCarritoVacio || !contenedorAccionesCarrito || !elementoTotalMonto) {
             console.error("[Carrito] Faltan elementos obligatorios en el DOM.");
