@@ -21,11 +21,11 @@ type Productos struct {
 
 // Struct de Transaccion
 type Transacciones struct {
-	TransaccionID      int       `json:"transaccion_id"`
+	TransaccionID      string    `json:"transaccion_id"`
 	TipoDocumento      string    `json:"tipo_documento"`
-	NumeroDocumento    int       `json:"numero_documento"`
+	NumeroDocumento    string    `json:"numero_documento"`
 	TipoCuenta         string    `json:"tipo_cuenta"`
-	CuentaOTelefono    int       `json:"cuenta_o_telefono"`
+	CuentaOTelefono    string    `json:"cuenta_o_telefono"`
 	BancoOrigen        string    `json:"banco_origen"`
 	MontoFinalUSD      float64   `json:"monto_final_usd"`
 	MontoFinalVES      float64   `json:"monto_final_ves"`
@@ -37,10 +37,21 @@ type Transacciones struct {
 	CodigoRechazo      string    `json:"codigo_rechazo"`
 }
 
+// Struct de Usuarios
+type Usuarios struct {
+	UsuarioID     int       `json:"usuario_id"`
+	Nombre        string    `json:"nombre"`
+	Apellido      string    `json:"apellido"`
+	Correo        string    `json:"correo"`
+	Contrasena    string    `json:"contrasena"`
+	FechaCreacion time.Time `json:"fecha_creacion"`
+	EsAdmin       bool      `json:"es_admin"`
+}
+
 // Variable global del paquete github.com/jackc/pgx/v5 para reutilizar la conexión
 var DB *pgx.Conn
 
-// 1. Función para inicializar la conexión (se llama en el main.go al arrancar la app)
+// Función para inicializar la conexión (se llama en el main.go al arrancar la app)
 func ConectarDB() error {
 	var err error
 	DB, err = pgx.Connect(
@@ -56,7 +67,7 @@ func ConectarDB() error {
 	return nil
 }
 
-// 2. Función para cerrar la conexión cuando se apague el servidor
+// Función para cerrar la conexión cuando se apague el servidor
 func CerrarDB() {
 	if DB != nil {
 		DB.Close(context.Background())
@@ -64,9 +75,8 @@ func CerrarDB() {
 	}
 }
 
-// 3. Función que consulta la vista y RETORNA los productos.
-// Ordenados por producto_id para que siempre aparezcan en el mismo
-// orden en el listado (no en el orden en que Postgres los devuelva).
+// Función que consulta la vista y RETORNA los productos.
+// Ordenados por producto_id para que siempre aparezcan en el mismo orden en el listado (no en el orden en que Postgres los devuelva).
 func ObtenerProductos() ([]Productos, error) {
 	rows, err := DB.Query(
 		context.Background(),
@@ -97,7 +107,7 @@ func ObtenerProductos() ([]Productos, error) {
 	return listaProductos, nil
 }
 
-// 4. Función que consulta UN SOLO producto por nombre.
+// Función que consulta UN SOLO producto por nombre.
 // La usa checkout.go para recalcular precio/stock/imagen de forma segura,
 // sin confiar en lo que mande el navegador. También trae producto_id,
 // necesario para guardar el detalle de cada transacción y para
@@ -118,8 +128,7 @@ func ObtenerProductoPorNombre(nombre string) (Productos, error) {
 	return p, nil
 }
 
-// 5. Inserta la cabecera de una transacción de pago en la tabla
-// "transacciones". Se llama cuando ya tenemos TODOS los datos del
+// Inserta la cabecera de una transacción de pago en la tabla "transacciones". Se llama cuando ya tenemos TODOS los datos del
 // pagador (justo después de que Sypago acepta la solicitud de OTP).
 func InsertarTransaccion(
 	transaccionID string,
@@ -149,7 +158,7 @@ func InsertarTransaccion(
 	return nil
 }
 
-// 6. Inserta una línea de detalle (un producto dentro de una transacción).
+// Inserta una línea de detalle (un producto dentro de una transacción).
 // Se llama una vez por cada producto del carrito, junto con InsertarTransaccion.
 func InsertarDetalle(transaccionID string, productoID int, cantidadProducto int) error {
 	_, err := DB.Exec(
@@ -163,7 +172,7 @@ func InsertarDetalle(transaccionID string, productoID int, cantidadProducto int)
 	return nil
 }
 
-// 7. Guarda la referencia de Sypago (transaction_id) apenas la tenemos,
+// Guarda la referencia de Sypago (transaction_id) apenas la tenemos,
 // justo después de confirmar el débito con el código OTP.
 func ActualizarReferenciaSypago(transaccionID string, referenciaSypago string) error {
 	_, err := DB.Exec(
@@ -177,7 +186,7 @@ func ActualizarReferenciaSypago(transaccionID string, referenciaSypago string) e
 	return nil
 }
 
-// 8. Actualiza el estado final de una transacción (ACCP, RJCT, CANC, etc.)
+// Actualiza el estado final de una transacción (ACCP, RJCT, CANC, etc.)
 // una vez que el polling obtiene una respuesta definitiva de Sypago.
 func ActualizarEstadoTransaccion(transaccionID string, estado string, codigoRechazo string) error {
 	_, err := DB.Exec(
@@ -191,7 +200,7 @@ func ActualizarEstadoTransaccion(transaccionID string, estado string, codigoRech
 	return nil
 }
 
-// 9. Descuenta stock real cuando una transacción queda ACEPTADA (ACCP).
+// Descuenta stock real cuando una transacción queda ACEPTADA.
 // La condición "stock >= $1" evita que el stock quede en negativo si dos
 // compras llegaran a completarse casi al mismo tiempo.
 func DescontarStock(productoID int, cantidad int) error {
@@ -209,6 +218,7 @@ func DescontarStock(productoID int, cantidad int) error {
 	return nil
 }
 
+// Función que consulta la bd y RETORNA las transacciones.
 func ObtenerTransaccionBD() ([]Transacciones, error) {
 	rows, err := DB.Query(
 		context.Background(),
@@ -237,4 +247,23 @@ func ObtenerTransaccionBD() ([]Transacciones, error) {
 	}
 
 	return listaTransacciones, nil
+}
+
+// Función que consulta la bd y RETORNA los usuarios, en este caso por el correo.
+func ObtenerUsuarioPorCorreo(correo string) (Usuarios, error) {
+	var u Usuarios
+
+	err := DB.QueryRow(
+		context.Background(),
+		`SELECT usuario_id, nombre, apellido, correo, contraseña, fecha_creacion, es_admin 
+		 FROM usuarios 
+		 WHERE correo = $1`,
+		correo,
+	).Scan(&u.UsuarioID, &u.Nombre, &u.Apellido, &u.Correo, &u.Contrasena, &u.FechaCreacion, &u.EsAdmin)
+
+	if err != nil {
+		return Usuarios{}, fmt.Errorf("usuario no encontrado: %w", err)
+	}
+
+	return u, nil
 }

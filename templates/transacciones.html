@@ -1,12 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{ .Titulo }}</title>
         <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
+        <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/static/css/style.css">
     </head>
-    <body>
-        <p>{{ .Transacciones }}</p>
+    <body class="transacciones-body">
+
+        <header class="transacciones-header">
+            <div class="transacciones-header-marca">
+                <span class="transacciones-header-logo">Sypago Store</span>
+                <span class="transacciones-header-subtitulo">Panel de transacciones</span>
+            </div>
+
+            <a href="/app/admin/logout" class="transacciones-boton-salir" id="boton-cerrar-sesion">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión
+            </a>
+        </header>
+
+        <main class="transacciones-container">
+
+            <div class="transacciones-tarjeta">
+
+                <div class="transacciones-tarjeta-titulo">
+                    <h2>Transacciones registradas</h2>
+                    <span class="transacciones-contador">{{ len .Transacciones }} en total</span>
+                </div>
+
+                {{ if .Transacciones }}
+                <div class="transacciones-tabla-scroll">
+                    <table class="transacciones-tabla">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Transacción</th>
+                                <th>Documento</th>
+                                <th>Cuenta / Teléfono</th>
+                                <th>Banco</th>
+                                <th>Monto USD</th>
+                                <th>Monto VES</th>
+                                <th>Estado</th>
+                                <th>Referencia Sypago</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Transacciones }}
+                            <tr>
+                                <td>{{ .FechaCreacion.Format "02/01/2006 03:04 PM" }}</td>
+                                <td class="transacciones-id">{{ .TransaccionID }}</td>
+                                <td>{{ .TipoDocumento }}-{{ .NumeroDocumento }}</td>
+                                <td>{{ .CuentaOTelefono }}</td>
+                                <td>{{ .BancoOrigen }}</td>
+                                <td>${{ printf "%.2f" .MontoFinalUSD }}</td>
+                                <td>Bs. {{ printf "%.2f" .MontoFinalVES }}</td>
+                                <td>
+                                    <span class="estado-pill estado-{{ .EstadoTransaccion }}">{{ .EstadoTransaccion }}</span>
+                                    {{ if .CodigoRechazo }}
+                                    <span class="transacciones-codigo-rechazo" title="Código de rechazo">{{ .CodigoRechazo }}</span>
+                                    {{ end }}
+                                </td>
+                                <td class="transacciones-referencia">
+                                    {{ if .ReferenciaSypago }}{{ .ReferenciaSypago }}{{ else }}—{{ end }}
+                                </td>
+                                <td>
+                                    {{ if eq .EstadoTransaccion "ACCP" }}
+                                    <button type="button" class="boton-reembolso" data-transaccion-id="{{ .TransaccionID }}">
+                                        <i class="fa-solid fa-rotate-left"></i> Reembolsar
+                                    </button>
+                                    {{ else }}
+                                    <span class="transacciones-sin-accion">—</span>
+                                    {{ end }}
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+                {{ else }}
+                <p class="transacciones-vacio">Todavía no hay transacciones registradas.</p>
+                {{ end }}
+
+            </div>
+
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="/static/js/transacciones.js"></script>
     </body>
 </html>

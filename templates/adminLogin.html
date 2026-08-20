@@ -9,22 +9,29 @@
     </head>
     <body class="bodyAdmin-login">
 
-        <div class="formularioAdmin"> <!--formulario-->
+        <div class="formularioAdmin"> 
             <h1>Inicio de Sesion</h1>
-            <form action="" method="post" class="formAdmin">
+            <form action="" method="post" class="formAdmin" id="formAdmin">
 
-                <div class="nameAdmin">  <!--username-->
-                    <input type="text" id="nombreAdmin" placeholder="Nombre" required>
+                <div class="correoAdmin">  
+                    <input type="email" id="correoAdmin" placeholder="Correo" required>
                 </div>
 
-                <div class="contraseñaAdmin"> <!--contrasena-->
+                <div class="contraseñaAdmin"> 
                     <input type="password" id="contrasenaAdmin" placeholder="Contraseña" required>
                 </div>
 
                 <button type="submit">Ingresar</button>
 
             </form>
+
+            <p id="errorMensaje">
+                Credenciales inválidas o sin autorización
+            </p>
+
         </div>
 
+        <script src="/static/js/adminLogin.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </body>
 </html>

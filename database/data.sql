@@ -377,3 +377,13 @@ CREATE INDEX idx_detalles_producto ON detalles(producto_id);
 UPDATE productos 
 SET stock = 20
 WHERE producto_id = 1;
+
+
+ALTER TABLE usuarios ADD COLUMN es_admin BOOLEAN DEFAULT FALSE NOT NULL;
+
+INSERT INTO usuarios (nombre, apellido, correo, contraseña)
+VALUES ('Usuario', 'Prueba', 'usuario@prueba.com', 'UsPrueba_02');
+
+UPDATE usuarios 
+SET es_admin = TRUE
+WHERE usuario_id = 1;
