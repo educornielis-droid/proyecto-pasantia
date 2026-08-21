@@ -239,7 +239,7 @@
     padding: 16px;
     font-size: 17px;
     font-weight: 700;
-    cursor: not-allowed;
+    cursor: pointer;
     opacity: 0.85;
 }
 

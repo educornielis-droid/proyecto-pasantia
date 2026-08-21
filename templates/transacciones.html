@@ -68,9 +68,23 @@
                                 </td>
                                 <td>
                                     {{ if eq .EstadoTransaccion "ACCP" }}
-                                    <button type="button" class="boton-reembolso" data-transaccion-id="{{ .TransaccionID }}">
-                                        <i class="fa-solid fa-rotate-left"></i> Reembolsar
-                                    </button>
+                                        {{ if eq .EstadoReembolso "ACCP" }}
+                                        <span class="boton-reembolso boton-reembolsado">
+                                            <i class="fa-solid fa-check"></i> Reembolsado
+                                        </span>
+                                        {{ else if eq .EstadoReembolso "RJCT" }}
+                                        <button type="button" class="boton-reembolso" data-transaccion-id="{{ .TransaccionID }}">
+                                            <i class="fa-solid fa-rotate-left"></i> Reintentar reembolso
+                                        </button>
+                                        {{ else if .EstadoReembolso }}
+                                        <span class="boton-reembolso boton-reembolso-procesando">
+                                            <i class="fa-solid fa-spinner"></i> Procesando...
+                                        </span>
+                                        {{ else }}
+                                        <button type="button" class="boton-reembolso" data-transaccion-id="{{ .TransaccionID }}">
+                                            <i class="fa-solid fa-rotate-left"></i> Reembolsar
+                                        </button>
+                                        {{ end }}
                                     {{ else }}
                                     <span class="transacciones-sin-accion">—</span>
                                     {{ end }}

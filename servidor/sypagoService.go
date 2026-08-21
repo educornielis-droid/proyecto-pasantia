@@ -24,7 +24,7 @@ import (
    ============================================================ */
 
 /* ------------------------------------------------------------
-   1. TASA DE CAMBIO
+   1. TASA DE CAMBIO (tal cual ya la tenías funcionando)
 ------------------------------------------------------------- */
 
 type TasaCambio struct {
@@ -595,6 +595,17 @@ func EstadoTransaccion(ruta *gin.Engine) {
 	ruta.GET("/api/checkout/:idTransaccion/estado", func(contexto *gin.Context) {
 		idTransaccion := contexto.Param("idTransaccion")
 
+		// --------------------------------------------------------------
+		// RAMA DE REEMBOLSO: ?contexto=reembolso
+		// A diferencia del flujo de compra en vivo (que usa la memoria del servidor), el reembolso puede pedirse días después desde
+		// el panel de administración, cuando esa memoria ya no existe.
+		// Por eso esta rama consulta y actualiza directo la BD.
+		// --------------------------------------------------------------
+		if contexto.Query("contexto") == "reembolso" {
+			manejarEstadoReembolso(contexto, idTransaccion)
+			return
+		}
+
 		transaccionActual, existe := obtenerTransaccion(idTransaccion)
 		if !existe {
 			contexto.JSON(http.StatusNotFound, gin.H{"error": "Transacción no encontrada"})
@@ -669,6 +680,84 @@ func EstadoTransaccion(ruta *gin.Engine) {
 			"descripcion":    descripcion,
 			"transaction_id": transaccionActual.Pago.TransactionID,
 		})
+	})
+}
+
+// Misma idea que la rama normal de EstadoTransaccion, pero para
+// reembolsos: lee/escribe en la tabla "transacciones" (columnas
+// estado_reembolso / referencia_reembolso / codigo_rechazo_reembolso)
+// en vez de la memoria del servidor.
+func manejarEstadoReembolso(contexto *gin.Context, idTransaccion string) {
+	transaccionBD, err := database.ObtenerTransaccionPorID(idTransaccion)
+	if err != nil {
+		contexto.JSON(http.StatusNotFound, gin.H{"error": "Transacción no encontrada"})
+		return
+	}
+
+	if transaccionBD.ReferenciaReembolso == "" {
+		contexto.JSON(http.StatusBadRequest, gin.H{"error": "No hay un reembolso en curso para esta transacción"})
+		return
+	}
+
+	// Si ya tenemos un estado definitivo guardado, no hace falta
+	// volver a consultar a Sypago - lo devolvemos directo.
+	if esEstadoDefinitivo(transaccionBD.EstadoReembolso) {
+		contexto.JSON(http.StatusOK, gin.H{
+			"estado":         transaccionBD.EstadoReembolso,
+			"codigo_rechazo": transaccionBD.CodigoRechazoReembolso,
+			"descripcion":    descripcionesCodigoRechazo[transaccionBD.CodigoRechazoReembolso],
+			"transaction_id": transaccionBD.ReferenciaReembolso,
+		})
+		return
+	}
+
+	token, err := obtenerTokenValido()
+	if err != nil {
+		fmt.Println("[Sypago Reembolso Estado] Error al obtener token:", err)
+		contexto.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo autenticar con Sypago"})
+		return
+	}
+
+	nuevoEstado, codigoRechazo, err := consultarEstadoEnSypago(token, transaccionBD.ReferenciaReembolso)
+	if err != nil {
+		fmt.Println("[Sypago Reembolso Estado] Error al consultar estado:", err)
+		contexto.JSON(http.StatusBadGateway, gin.H{"error": "No se pudo consultar el estado con el proveedor"})
+		return
+	}
+
+	estadoAnterior := transaccionBD.EstadoReembolso // antes de sobrescribir, para saber si es la PRIMERA vez que llega a ACCP
+
+	descripcion := descripcionesCodigoRechazo[codigoRechazo]
+	if descripcion != "" {
+		fmt.Println("[Sypago Reembolso Estado] Código:", codigoRechazo, "-", descripcion)
+	}
+
+	if esEstadoDefinitivo(nuevoEstado) {
+		if errorEstado := database.ActualizarEstadoReembolso(idTransaccion, nuevoEstado, codigoRechazo); errorEstado != nil {
+			fmt.Println("[BD] Error al actualizar estado de reembolso de", idTransaccion, ":", errorEstado)
+		}
+
+		// Reponemos stock SOLO la primera vez que el reembolso queda
+		// aceptado para esta transacción.
+		if nuevoEstado == "ACCP" && estadoAnterior != "ACCP" {
+			detalle, errorDetalle := database.ObtenerDetallePorTransaccion(idTransaccion)
+			if errorDetalle != nil {
+				fmt.Println("[BD] Error al obtener detalle para reponer stock de", idTransaccion, ":", errorDetalle)
+			} else {
+				for _, item := range detalle {
+					if errorStock := database.AumentarStock(item.ProductoID, item.CantidadProducto); errorStock != nil {
+						fmt.Println("[BD] Error al reponer stock del producto", item.ProductoID, ":", errorStock)
+					}
+				}
+			}
+		}
+	}
+
+	contexto.JSON(http.StatusOK, gin.H{
+		"estado":         nuevoEstado,
+		"codigo_rechazo": codigoRechazo,
+		"descripcion":    descripcion,
+		"transaction_id": transaccionBD.ReferenciaReembolso,
 	})
 }
 

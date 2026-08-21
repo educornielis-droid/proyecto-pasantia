@@ -873,6 +873,13 @@ hr {
 
 /* -------- Seccion de transacciones ---------- */
 
+/* ============================================================
+   TRANSACCIONES.HTML — Panel de administración
+   Reutiliza los tokens de color ya establecidos en el sitio:
+   azul rgb(0,101,187), degradado rgb(0,65,125)→rgb(0,110,210),
+   tarjetas blancas redondeadas, Poppins.
+   ============================================================ */
+
 .transacciones-body {
     background-color: #e2e2e2;
     background: linear-gradient(to bottom right, rgb(158, 190, 219), #e2e2e2);
@@ -880,6 +887,7 @@ hr {
     min-height: 100vh;
 }
 
+/* -------- Header -------- */
 .transacciones-header {
     display: flex;
     align-items: center;
@@ -925,6 +933,7 @@ hr {
     background-color: rgba(255, 255, 255, 0.28);
 }
 
+/* -------- Contenedor principal -------- */
 .transacciones-container {
     max-width: 1300px;
     margin: 0 auto;
@@ -961,6 +970,7 @@ hr {
     border-radius: 20px;
 }
 
+/* -------- Tabla -------- */
 .transacciones-tabla-scroll {
     overflow-x: auto;
 }
@@ -1026,6 +1036,7 @@ hr {
     font-size: 15px;
 }
 
+/* -------- Óvalos de estado -------- */
 .estado-pill {
     display: inline-block;
     padding: 5px 14px;
@@ -1057,6 +1068,7 @@ hr {
     color: rgb(0, 101, 187);
 }
 
+/* -------- Botón de reembolso (visual, sin lógica todavía) -------- */
 .boton-reembolso {
     display: inline-flex;
     align-items: center;
@@ -1076,6 +1088,44 @@ hr {
 .boton-reembolso:hover {
     background-color: rgb(0, 101, 187);
     color: #FEFFFF;
+}
+
+
+/* -------- Estado: ya reembolsado -------- */
+.boton-reembolsado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #eef1f5;
+    color: #747B8F;
+    border: 1px solid #e0e0e6;
+    padding: 7px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: default;
+}
+
+/* -------- Estado: reembolso en curso (PEND/PROC) -------- */
+.boton-reembolso-procesando {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #FFF4E0;
+    color: #B9770E;
+    border: 1px solid #F5D9A8;
+    padding: 7px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.boton-reembolso-procesando i {
+    animation: girar-icono 1s linear infinite;
+}
+
+@keyframes girar-icono {
+    to { transform: rotate(360deg); }
 }
 
 

@@ -13,5 +13,13 @@ func Main() {
 	SolicitarOTP(ruta)
 	ConfirmarOTP(ruta)
 	EstadoTransaccion(ruta)
-	ruta.Run(":8080")
+	Reembolso(ruta)
+
+	ruta.GET("/ping", func(contexto *gin.Context) {
+		contexto.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
+	ruta.Run("0.0.0.0:8080")
 }

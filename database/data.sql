@@ -387,3 +387,106 @@ VALUES ('Usuario', 'Prueba', 'usuario@prueba.com', 'UsPrueba_02');
 UPDATE usuarios 
 SET es_admin = TRUE
 WHERE usuario_id = 1;
+
+
+ALTER TABLE transacciones ADD COLUMN IF NOT EXISTS estado_reembolso TEXT;
+ALTER TABLE transacciones ADD COLUMN IF NOT EXISTS referencia_reembolso TEXT;
+ALTER TABLE transacciones ADD COLUMN IF NOT EXISTS codigo_rechazo_reembolso TEXT;
+
+
+
+UPDATE productos 
+SET stock = 40
+WHERE producto_id = 7;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Teclado_Mecánico_60_Inalámbrico.png'
+WHERE producto_id = 34;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Mouse_Vertical_Ergonómico.png'
+WHERE producto_id = 35;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Micrófono_Lavarier_Inalámbrico.png'
+WHERE producto_id = 36;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Auriculares_In_Ear_TWS_Gamer.png'
+WHERE producto_id = 37;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Smartphone_Pro_Max 256GB.png'
+WHERE producto_id = 38;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Feature_Phone_Básico_4G.png'
+WHERE producto_id = 39;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Power Bank_20000mAh_22.5W.png'
+WHERE producto_id = 40;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Organizador_Cables_Rígido.png'
+WHERE producto_id = 41;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Volante_y_Pedales_Carreras.png'
+WHERE producto_id = 42;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Escritorio_Gamer_con_Luces_LED.png'
+WHERE producto_id = 43;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Memoria_USB_3_128GB.png'
+WHERE producto_id = 44;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Tarjeta_MicroSD_XC_256GB.png'
+WHERE producto_id = 45;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Enchufe_Inteligente_Wi_Fi.png'
+WHERE producto_id = 46;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Tira_LED_RGBIC_5_Metros.png'
+WHERE producto_id = 47;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Pulsera_Actividad_Smart_Band.png'
+WHERE producto_id = 48;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Reloj_Inteligente_Militar.png'
+WHERE producto_id = 49;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Repetidor_Wi_Fi_Dual_Band.png'
+WHERE producto_id = 50;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Switch_Gigabit_8_Puertos.png'
+WHERE producto_id = 51;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Lámpara_Monitor_Bar.png'
+WHERE producto_id = 52;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Soporte_Ajustable_para_SmartphoneTablet.png'
+WHERE producto_id = 53;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Webcam_2K_con_Aro_Luz.png'
+WHERE producto_id = 54;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Amplificador_Auriculares_DAC_USB.png'
+WHERE producto_id = 55;
+
+UPDATE productos 
+SET imagen_url = '/static/img/Funda_Protectora_para_Laptop_15.6.png'
+WHERE producto_id = 56;

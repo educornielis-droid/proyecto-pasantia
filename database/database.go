@@ -21,20 +21,29 @@ type Productos struct {
 
 // Struct de Transaccion
 type Transacciones struct {
-	TransaccionID      string    `json:"transaccion_id"`
-	TipoDocumento      string    `json:"tipo_documento"`
-	NumeroDocumento    string    `json:"numero_documento"`
-	TipoCuenta         string    `json:"tipo_cuenta"`
-	CuentaOTelefono    string    `json:"cuenta_o_telefono"`
-	BancoOrigen        string    `json:"banco_origen"`
-	MontoFinalUSD      float64   `json:"monto_final_usd"`
-	MontoFinalVES      float64   `json:"monto_final_ves"`
-	TasaCambio         float64   `json:"tasa_cambio"`
-	EstadoTransaccion  string    `json:"estado_transaccion"`
-	ReferenciaSypago   string    `json:"referencia_sypago"`
-	FechaCreacion      time.Time `json:"fecha_creacion"`
-	FechaActualizacion time.Time `json:"fecha_actualizacion"`
-	CodigoRechazo      string    `json:"codigo_rechazo"`
+	TransaccionID          string    `json:"transaccion_id"`
+	TipoDocumento          string    `json:"tipo_documento"`
+	NumeroDocumento        string    `json:"numero_documento"`
+	TipoCuenta             string    `json:"tipo_cuenta"`
+	CuentaOTelefono        string    `json:"cuenta_o_telefono"`
+	BancoOrigen            string    `json:"banco_origen"`
+	MontoFinalUSD          float64   `json:"monto_final_usd"`
+	MontoFinalVES          float64   `json:"monto_final_ves"`
+	TasaCambio             float64   `json:"tasa_cambio"`
+	EstadoTransaccion      string    `json:"estado_transaccion"`
+	ReferenciaSypago       string    `json:"referencia_sypago"`
+	FechaCreacion          time.Time `json:"fecha_creacion"`
+	FechaActualizacion     time.Time `json:"fecha_actualizacion"`
+	CodigoRechazo          string    `json:"codigo_rechazo"`
+	EstadoReembolso        string    `json:"estado_reembolso"`     // "" = sin reembolso, PEND/PROC/ACCP/RJCT/CANC = en curso o resuelto
+	ReferenciaReembolso    string    `json:"referencia_reembolso"` // transaction_id de Sypago para el crédito
+	CodigoRechazoReembolso string    `json:"codigo_rechazo_reembolso"`
+}
+
+// Una línea de detalle: qué producto y cuántas unidades tenía la transacción
+type DetalleTransaccion struct {
+	ProductoID       int `json:"producto_id"`
+	CantidadProducto int `json:"cantidad_producto"`
 }
 
 // Struct de Usuarios
@@ -51,7 +60,7 @@ type Usuarios struct {
 // Variable global del paquete github.com/jackc/pgx/v5 para reutilizar la conexión
 var DB *pgx.Conn
 
-// Función para inicializar la conexión (se llama en el main.go al arrancar la app)
+// 1. Función para inicializar la conexión (se llama en el main.go al arrancar la app)
 func ConectarDB() error {
 	var err error
 	DB, err = pgx.Connect(
@@ -67,7 +76,7 @@ func ConectarDB() error {
 	return nil
 }
 
-// Función para cerrar la conexión cuando se apague el servidor
+// 2. Función para cerrar la conexión cuando se apague el servidor
 func CerrarDB() {
 	if DB != nil {
 		DB.Close(context.Background())
@@ -75,8 +84,7 @@ func CerrarDB() {
 	}
 }
 
-// Función que consulta la vista y RETORNA los productos.
-// Ordenados por producto_id para que siempre aparezcan en el mismo orden en el listado (no en el orden en que Postgres los devuelva).
+// 3. Función que consulta la vista y RETORNA los productos.
 func ObtenerProductos() ([]Productos, error) {
 	rows, err := DB.Query(
 		context.Background(),
@@ -91,12 +99,10 @@ func ObtenerProductos() ([]Productos, error) {
 
 	for rows.Next() {
 		var p Productos
-
 		err := rows.Scan(&p.ProductoID, &p.Nombre, &p.Descripcion, &p.NombreCategoria, &p.Precio, &p.Stock, &p.ImagenURL)
 		if err != nil {
 			return nil, fmt.Errorf("error al escanear fila: %w", err)
 		}
-
 		listaProductos = append(listaProductos, p)
 	}
 
@@ -107,11 +113,7 @@ func ObtenerProductos() ([]Productos, error) {
 	return listaProductos, nil
 }
 
-// Función que consulta UN SOLO producto por nombre.
-// La usa checkout.go para recalcular precio/stock/imagen de forma segura,
-// sin confiar en lo que mande el navegador. También trae producto_id,
-// necesario para guardar el detalle de cada transacción y para
-// descontar stock por ID (no por nombre).
+// 4. Función que consulta UN SOLO producto por nombre.
 func ObtenerProductoPorNombre(nombre string) (Productos, error) {
 	var p Productos
 
@@ -128,8 +130,7 @@ func ObtenerProductoPorNombre(nombre string) (Productos, error) {
 	return p, nil
 }
 
-// Inserta la cabecera de una transacción de pago en la tabla "transacciones". Se llama cuando ya tenemos TODOS los datos del
-// pagador (justo después de que Sypago acepta la solicitud de OTP).
+// 5. Inserta la cabecera de una transacción de pago en la tabla "transacciones".
 func InsertarTransaccion(
 	transaccionID string,
 	tipoDocumento string,
@@ -158,8 +159,7 @@ func InsertarTransaccion(
 	return nil
 }
 
-// Inserta una línea de detalle (un producto dentro de una transacción).
-// Se llama una vez por cada producto del carrito, junto con InsertarTransaccion.
+// 6. Inserta una línea de detalle (un producto dentro de una transacción).
 func InsertarDetalle(transaccionID string, productoID int, cantidadProducto int) error {
 	_, err := DB.Exec(
 		context.Background(),
@@ -172,8 +172,7 @@ func InsertarDetalle(transaccionID string, productoID int, cantidadProducto int)
 	return nil
 }
 
-// Guarda la referencia de Sypago (transaction_id) apenas la tenemos,
-// justo después de confirmar el débito con el código OTP.
+// 7. Guarda la referencia de Sypago (transaction_id) apenas la tenemos.
 func ActualizarReferenciaSypago(transaccionID string, referenciaSypago string) error {
 	_, err := DB.Exec(
 		context.Background(),
@@ -186,8 +185,7 @@ func ActualizarReferenciaSypago(transaccionID string, referenciaSypago string) e
 	return nil
 }
 
-// Actualiza el estado final de una transacción (ACCP, RJCT, CANC, etc.)
-// una vez que el polling obtiene una respuesta definitiva de Sypago.
+// 8. Actualiza el estado final de una transacción (ACCP, RJCT, CANC, etc.)
 func ActualizarEstadoTransaccion(transaccionID string, estado string, codigoRechazo string) error {
 	_, err := DB.Exec(
 		context.Background(),
@@ -200,9 +198,7 @@ func ActualizarEstadoTransaccion(transaccionID string, estado string, codigoRech
 	return nil
 }
 
-// Descuenta stock real cuando una transacción queda ACEPTADA.
-// La condición "stock >= $1" evita que el stock quede en negativo si dos
-// compras llegaran a completarse casi al mismo tiempo.
+// 9. Descuenta stock real cuando una transacción queda ACEPTADA (ACCP).
 func DescontarStock(productoID int, cantidad int) error {
 	resultado, err := DB.Exec(
 		context.Background(),
@@ -218,14 +214,21 @@ func DescontarStock(productoID int, cantidad int) error {
 	return nil
 }
 
-// Función que consulta la bd y RETORNA las transacciones.
+// 10. Trae todas las transacciones guardadas, la más reciente primero.
 func ObtenerTransaccionBD() ([]Transacciones, error) {
 	rows, err := DB.Query(
 		context.Background(),
-		"SELECT transaccion_id, tipo_documento, numero_documento, tipo_cuenta, cuenta_o_telefono, banco_origen, monto_final_usd, monto_final_ves, tasa_cambio, estado_transaccion, referencia_sypago, fecha_creacion, fecha_actualizacion, COALESCE(codigo_rechazo, '') FROM transacciones ORDER BY fecha_creacion DESC",
+		`SELECT transaccion_id, tipo_documento, numero_documento, tipo_cuenta,
+		        cuenta_o_telefono, banco_origen, monto_final_usd, monto_final_ves,
+		        tasa_cambio, estado_transaccion, COALESCE(referencia_sypago, ''),
+		        fecha_creacion, fecha_actualizacion, COALESCE(codigo_rechazo, ''),
+		        COALESCE(estado_reembolso, ''), COALESCE(referencia_reembolso, ''),
+		        COALESCE(codigo_rechazo_reembolso, '')
+		 FROM transacciones
+		 ORDER BY fecha_creacion DESC`,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("error al consultar v_productos: %w", err)
+		return nil, fmt.Errorf("error al consultar transacciones: %w", err)
 	}
 	defer rows.Close()
 
@@ -233,12 +236,16 @@ func ObtenerTransaccionBD() ([]Transacciones, error) {
 
 	for rows.Next() {
 		var t Transacciones
-
-		err := rows.Scan(&t.TransaccionID, &t.TipoDocumento, &t.NumeroDocumento, &t.TipoCuenta, &t.CuentaOTelefono, &t.BancoOrigen, &t.MontoFinalUSD, &t.MontoFinalVES, &t.TasaCambio, &t.EstadoTransaccion, &t.ReferenciaSypago, &t.FechaCreacion, &t.FechaActualizacion, &t.CodigoRechazo)
+		err := rows.Scan(
+			&t.TransaccionID, &t.TipoDocumento, &t.NumeroDocumento, &t.TipoCuenta,
+			&t.CuentaOTelefono, &t.BancoOrigen, &t.MontoFinalUSD, &t.MontoFinalVES,
+			&t.TasaCambio, &t.EstadoTransaccion, &t.ReferenciaSypago,
+			&t.FechaCreacion, &t.FechaActualizacion, &t.CodigoRechazo,
+			&t.EstadoReembolso, &t.ReferenciaReembolso, &t.CodigoRechazoReembolso,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("error al escanear fila: %w", err)
 		}
-
 		listaTransacciones = append(listaTransacciones, t)
 	}
 
@@ -247,6 +254,114 @@ func ObtenerTransaccionBD() ([]Transacciones, error) {
 	}
 
 	return listaTransacciones, nil
+}
+
+// 11. Trae UNA sola transacción por su ID. La usa el flujo de reembolso
+// para recuperar todos los datos del pagador original (cuenta, banco,
+// documento) y el monto exacto que se cobró en su momento.
+func ObtenerTransaccionPorID(transaccionID string) (Transacciones, error) {
+	var t Transacciones
+
+	err := DB.QueryRow(
+		context.Background(),
+		`SELECT transaccion_id, tipo_documento, numero_documento, tipo_cuenta,
+		        cuenta_o_telefono, banco_origen, monto_final_usd, monto_final_ves,
+		        tasa_cambio, estado_transaccion, COALESCE(referencia_sypago, ''),
+		        fecha_creacion, fecha_actualizacion, COALESCE(codigo_rechazo, ''),
+		        COALESCE(estado_reembolso, ''), COALESCE(referencia_reembolso, ''),
+		        COALESCE(codigo_rechazo_reembolso, '')
+		 FROM transacciones
+		 WHERE transaccion_id = $1`,
+		transaccionID,
+	).Scan(
+		&t.TransaccionID, &t.TipoDocumento, &t.NumeroDocumento, &t.TipoCuenta,
+		&t.CuentaOTelefono, &t.BancoOrigen, &t.MontoFinalUSD, &t.MontoFinalVES,
+		&t.TasaCambio, &t.EstadoTransaccion, &t.ReferenciaSypago,
+		&t.FechaCreacion, &t.FechaActualizacion, &t.CodigoRechazo,
+		&t.EstadoReembolso, &t.ReferenciaReembolso, &t.CodigoRechazoReembolso,
+	)
+
+	if err != nil {
+		return Transacciones{}, fmt.Errorf("transacción no encontrada: %w", err)
+	}
+
+	return t, nil
+}
+
+// 12. Trae el detalle (productos + cantidades) de una transacción.
+// La usa el reembolso para saber qué stock hay que reponer.
+func ObtenerDetallePorTransaccion(transaccionID string) ([]DetalleTransaccion, error) {
+	rows, err := DB.Query(
+		context.Background(),
+		"SELECT producto_id, cantidad_producto FROM detalles WHERE transaccion_id = $1",
+		transaccionID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error al consultar detalle de %s: %w", transaccionID, err)
+	}
+	defer rows.Close()
+
+	var listaDetalle []DetalleTransaccion
+
+	for rows.Next() {
+		var d DetalleTransaccion
+		if err := rows.Scan(&d.ProductoID, &d.CantidadProducto); err != nil {
+			return nil, fmt.Errorf("error al escanear detalle: %w", err)
+		}
+		listaDetalle = append(listaDetalle, d)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error durante la iteración: %w", err)
+	}
+
+	return listaDetalle, nil
+}
+
+// 13. Marca el inicio de un reembolso. La condición "estado_reembolso IS NULL"
+// evita que se pueda iniciar dos veces el mismo reembolso (protección
+// contra doble clic o dos peticiones casi simultáneas).
+func IniciarReembolso(transaccionID string, referenciaReembolso string) error {
+	resultado, err := DB.Exec(
+		context.Background(),
+		"UPDATE transacciones SET estado_reembolso = 'PEND', referencia_reembolso = $1, fecha_actualizacion = now() WHERE transaccion_id = $2 AND estado_reembolso IS NULL",
+		referenciaReembolso, transaccionID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al iniciar reembolso de %s: %w", transaccionID, err)
+	}
+	if resultado.RowsAffected() == 0 {
+		return fmt.Errorf("la transacción %s no existe o ya tiene un reembolso en curso", transaccionID)
+	}
+	return nil
+}
+
+// 14. Actualiza el estado del reembolso (PEND -> ACCP/RJCT/CANC) según
+// lo que vaya reportando el polling contra Sypago.
+func ActualizarEstadoReembolso(transaccionID string, estado string, codigoRechazo string) error {
+	_, err := DB.Exec(
+		context.Background(),
+		"UPDATE transacciones SET estado_reembolso = $1, codigo_rechazo_reembolso = NULLIF($2, ''), fecha_actualizacion = now() WHERE transaccion_id = $3",
+		estado, codigoRechazo, transaccionID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al actualizar estado de reembolso de %s: %w", transaccionID, err)
+	}
+	return nil
+}
+
+// 15. Repone stock cuando un reembolso queda ACEPTADO (ACCP). Es el
+// inverso exacto de DescontarStock.
+func AumentarStock(productoID int, cantidad int) error {
+	_, err := DB.Exec(
+		context.Background(),
+		"UPDATE productos SET stock = stock + $1 WHERE producto_id = $2",
+		cantidad, productoID,
+	)
+	if err != nil {
+		return fmt.Errorf("error al aumentar stock del producto %d: %w", productoID, err)
+	}
+	return nil
 }
 
 // Función que consulta la bd y RETORNA los usuarios, en este caso por el correo.
