@@ -871,14 +871,248 @@ hr {
     display: none;
 }
 
-/* -------- Seccion de transacciones ---------- */
+/* Seccion de inicio */
 
-/* ============================================================
-   TRANSACCIONES.HTML — Panel de administración
-   Reutiliza los tokens de color ya establecidos en el sitio:
-   azul rgb(0,101,187), degradado rgb(0,65,125)→rgb(0,110,210),
-   tarjetas blancas redondeadas, Poppins.
-   ============================================================ */
+/* -------- Hero carrusel -------- */
+.hero-carrusel {
+    position: relative;
+    width: 100%;
+    top: 50px;
+    min-height: 480px;
+    border-radius: 30px;
+    background-color: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+ 
+.hero-carrusel-viewport {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+ 
+.hero-carrusel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+ 
+.hero-slide {
+    flex: 0 0 100%;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px 70px;
+    gap: 30px;
+}
+ 
+.hero-slide-info {
+    width: 50%;
+}
+ 
+.hero-slide-etiqueta {
+    display: inline-block;
+    background-color: #eef4fb;
+    color: rgb(0, 101, 187);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+}
+ 
+.hero-slide-info h1 {
+    font-size: 42px;
+    color: #181818;
+    margin-bottom: 14px;
+    text-transform: capitalize;
+}
+ 
+.hero-slide-info p {
+    color: #747B8F;
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 420px;
+}
+ 
+.hero-slide-boton {
+    display: inline-block;
+    margin-top: 25px;
+}
+ 
+.hero-slide-img {
+    width: 45%;
+    text-align: center;
+}
+ 
+.hero-slide-img img {
+    max-width: 100%;
+    max-height: 340px;
+    object-fit: contain;
+}
+ 
+/* -------- Flechas y puntos del hero -------- */
+.hero-flecha {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background-color: #ffffff;
+    color: rgb(0, 101, 187);
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transition: 0.2s;
+    z-index: 5;
+}
+ 
+.hero-flecha:hover {
+    background-color: rgb(0, 101, 187);
+    color: #ffffff;
+}
+ 
+.hero-flecha-izq {
+    left: 20px;
+}
+ 
+.hero-flecha-der {
+    right: 20px;
+}
+ 
+.hero-puntos {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+}
+ 
+.hero-punto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #d7dee8;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 0;
+}
+ 
+.hero-punto-activo {
+    background-color: rgb(0, 101, 187);
+    width: 22px;
+    border-radius: 5px;
+}
+ 
+/* -------- ¿Por qué elegirnos? -------- */
+.porque-elegirnos {
+    padding: 60px 0;
+    text-align: center;
+}
+ 
+.porque-elegirnos h2 {
+    font-size: 40px;
+    color: #181818;
+    margin-bottom: 40px;
+}
+ 
+.porque-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+ 
+.porque-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 32px 22px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+    transition: 0.25s;
+}
+ 
+.porque-card:hover {
+    transform: translateY(-6px);
+}
+ 
+.porque-card i {
+    font-size: 30px;
+    color: rgb(0, 101, 187);
+    margin-bottom: 16px;
+}
+ 
+.porque-card h3 {
+    font-size: 17px;
+    color: #181818;
+    margin-bottom: 10px;
+}
+ 
+.porque-card p {
+    font-size: 14px;
+    color: #747B8F;
+    line-height: 1.5;
+}
+ 
+/* -------- Cómo comprar -------- */
+.como-comprar {
+    padding: 20px 0 60px 0;
+    text-align: center;
+}
+ 
+.como-comprar h2 {
+    font-size: 40px;
+    color: #181818;
+    margin-bottom: 40px;
+}
+ 
+.pasos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+ 
+.paso-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 36px 28px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+ 
+.paso-numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(to right, rgb(0, 65, 125), rgb(0, 110, 210));
+    color: #FEFFFF;
+    font-weight: 800;
+    font-size: 17px;
+    margin-bottom: 16px;
+}
+ 
+.paso-card h3 {
+    font-size: 18px;
+    color: #181818;
+    margin-bottom: 8px;
+}
+ 
+.paso-card p {
+    font-size: 14px;
+    color: #747B8F;
+    line-height: 1.5;
+}
+
+
+/* -------- Seccion de transacciones ---------- */
 
 .transacciones-body {
     background-color: #e2e2e2;
@@ -887,7 +1121,6 @@ hr {
     min-height: 100vh;
 }
 
-/* -------- Header -------- */
 .transacciones-header {
     display: flex;
     align-items: center;
@@ -933,7 +1166,6 @@ hr {
     background-color: rgba(255, 255, 255, 0.28);
 }
 
-/* -------- Contenedor principal -------- */
 .transacciones-container {
     max-width: 1300px;
     margin: 0 auto;
@@ -970,7 +1202,6 @@ hr {
     border-radius: 20px;
 }
 
-/* -------- Tabla -------- */
 .transacciones-tabla-scroll {
     overflow-x: auto;
 }
@@ -1036,7 +1267,6 @@ hr {
     font-size: 15px;
 }
 
-/* -------- Óvalos de estado -------- */
 .estado-pill {
     display: inline-block;
     padding: 5px 14px;
@@ -1068,7 +1298,6 @@ hr {
     color: rgb(0, 101, 187);
 }
 
-/* -------- Botón de reembolso (visual, sin lógica todavía) -------- */
 .boton-reembolso {
     display: inline-flex;
     align-items: center;
@@ -1090,8 +1319,6 @@ hr {
     color: #FEFFFF;
 }
 
-
-/* -------- Estado: ya reembolsado -------- */
 .boton-reembolsado {
     display: inline-flex;
     align-items: center;
@@ -1106,7 +1333,6 @@ hr {
     cursor: default;
 }
 
-/* -------- Estado: reembolso en curso (PEND/PROC) -------- */
 .boton-reembolso-procesando {
     display: inline-flex;
     align-items: center;
@@ -1604,6 +1830,54 @@ hr {
     .header-txt h1 {
         font-size: 28px; /* Tamaño adaptado a pantallas móviles */
         margin-bottom: 10px;
+    }
+
+    .hero-carrusel,
+    .hero-slide {
+        min-height: auto;
+    }
+ 
+    .hero-slide {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 30px 60px 30px;
+    }
+ 
+    .hero-slide-info,
+    .hero-slide-img {
+        width: 100%;
+    }
+ 
+    .hero-slide-info p {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+ 
+    .hero-slide-img img {
+        max-height: 220px;
+        margin-top: 20px;
+    }
+ 
+    .hero-flecha {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+ 
+    .porque-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+ 
+    .pasos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .porque-grid {
+        grid-template-columns: 1fr;
+    }
+ 
+    .hero-slide-info h1 {
+        font-size: 30px;
     }
 
     .precios {

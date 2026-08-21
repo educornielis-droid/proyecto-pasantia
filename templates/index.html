@@ -7,20 +7,19 @@
         <title>{{.Title}}</title>
         <link rel="shortcut icon" href="{{ .Logo }}" type="image/x-icon">
         <script src="https://kit.fontawesome.com/e82cc17c5d.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"/>
-        <link rel="stylesheet" href="./static/css/style.css">
+        <link rel="stylesheet" href="/static/css/style.css">
     </head>
 
     <body>
         <header class="header header-inicio">
             <div class="menu container">
-                
+
                 <a href="#" class="logo">Sypago Store</a>
                 <input type="checkbox" id="menu"/>
                 <label for="menu">
                     <i class="fa-solid fa-bars" id="menu-icono"></i>
                 </label>
-                
+
                 <nav class="navbar">
                     <ul>
                         <li><a href="#">Inicio</a></li>
@@ -67,9 +66,9 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <i class="fa-solid fa-user" id="logo-usuario" onclick="window.location.href='/app/login'"></i>
-                
+
                 <div class="tdc">
                     <p>
                         <span class="label">Tasa del día (bcv):</span>
@@ -81,54 +80,85 @@
 
             <div class="header-content container">
 
-                <div class="swiper mySwiper-1">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="header-info">
-                                <div class="header-txt">
+                <!-- Carrusel propio, liviano, sin Swiper: avanza solo cada
+                     5s y el usuario también puede moverlo con las flechas
+                     o los puntos. Los 3 productos son reales de tu BD, así
+                     que "Agregar al Carrito" funciona de punta a punta. -->
+                <div class="hero-carrusel" id="hero-carrusel">
+                    <div class="hero-carrusel-viewport">
+                        <div class="hero-carrusel-track" id="hero-track">
+
+                            <div class="hero-slide">
+                                <div class="hero-slide-info">
+                                    <span class="hero-slide-etiqueta">Recién llegado</span>
+                                    <h1>Camisa Oficial SyPago</h1>
+                                    <p>Camisa 100% de algodón con logo estampado, cómoda para el día a día.</p>
+                                    <div class="precios">
+                                        <p class="precio">$15.00</p>
+                                    </div>
+                                    <a href="#" class="agregar-carrito btn-1 hero-slide-boton"
+                                       data-nombre="Camisa Oficial SyPago"
+                                       data-precio="15.00"
+                                       data-imagen="/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png">
+                                        Agregar al Carrito
+                                    </a>
+                                </div>
+                                <div class="hero-slide-img">
+                                    <img src="/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png" alt="Camisa Oficial SyPago" loading="lazy">
+                                </div>
+                            </div>
+
+                            <div class="hero-slide">
+                                <div class="hero-slide-info">
+                                    <span class="hero-slide-etiqueta">Favorito del equipo</span>
+                                    <h1>Taza Termica SyPago</h1>
+                                    <p>Taza de acero inoxidable para café, mantiene la temperatura por horas.</p>
+                                    <div class="precios">
+                                        <p class="precio">$8.50</p>
+                                    </div>
+                                    <a href="#" class="agregar-carrito btn-1 hero-slide-boton"
+                                       data-nombre="Taza Termica SyPago"
+                                       data-precio="8.50"
+                                       data-imagen="/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png">
+                                        Agregar al Carrito
+                                    </a>
+                                </div>
+                                <div class="hero-slide-img">
+                                    <img src="/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png" alt="Taza Termica SyPago" loading="lazy">
+                                </div>
+                            </div>
+
+                            <div class="hero-slide">
+                                <div class="hero-slide-info">
+                                    <span class="hero-slide-etiqueta">Lo más potente</span>
                                     <h1>Laptop Pro 15"</h1>
+                                    <p>Rendimiento profesional en un formato portátil, lista para trabajar donde sea.</p>
                                     <div class="precios">
-                                        <p class="precio">$850</p>
+                                        <p class="precio">$850.00</p>
                                     </div>
-                                    <a href="#" class="btn-1">Información</a>
+                                    <a href="#" class="agregar-carrito btn-1 hero-slide-boton"
+                                       data-nombre="Laptop Pro 15&quot;"
+                                       data-precio="850.00"
+                                       data-imagen="/static/img/Laptop_Pro_15.png">
+                                        Agregar al Carrito
+                                    </a>
                                 </div>
-                                <div class="header-img">
-                                    <img src="/static/img/Laptop_Pro_15.png" alt="" loading="lazy">
+                                <div class="hero-slide-img">
+                                    <img src="/static/img/Laptop_Pro_15.png" alt="Laptop Pro 15 pulgadas" loading="lazy">
                                 </div>
                             </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="header-info">
-                                <div class="header-txt">
-                                    <h1>Monitor Gamer 27"</h1>
-                                    <div class="precios">
-                                        <p class="precio">$220</p>
-                                    </div>
-                                    <a href="#" class="btn-1">Información</a>
-                                </div>
-                                <div class="header-img">
-                                    <img src="/static/img/Monitor_Gamer_27.png" alt="" loading="lazy">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="header-info">
-                                <div class="header-txt">
-                                    <h1>Teclado Mecánico RGB</h1>
-                                    <div class="precios">
-                                        <p class="precio">$20.5</p>
-                                    </div>
-                                    <a href="#" class="btn-1">Información</a>
-                                </div>
-                                <div class="header-img">
-                                    <img src="/static/img/Teclado_Mecánico_RGB.png" alt="" loading="lazy">
-                                </div>
-                            </div>
+
                         </div>
                     </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
+
+                    <button type="button" class="hero-flecha hero-flecha-izq" id="hero-anterior" aria-label="Producto anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button type="button" class="hero-flecha hero-flecha-der" id="hero-siguiente" aria-label="Producto siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <div class="hero-puntos" id="hero-puntos"></div>
                 </div>
 
             </div>
@@ -137,54 +167,112 @@
 
         <hr>
 
+        <!-- ¿Por qué elegirnos? -->
+        <section class="porque-elegirnos container">
+            <h2>¿Por qué elegirnos?</h2>
+            <div class="porque-grid">
+                <div class="porque-card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>Pagos seguros con Sypago</h3>
+                    <p>Cada compra se verifica y se cobra en tiempo real a través de Sypago, con validación por clave OTP.</p>
+                </div>
+                <div class="porque-card">
+                    <i class="fa-solid fa-bolt"></i>
+                    <h3>Confirmación al instante</h3>
+                    <p>Sabes si tu pago fue aceptado en segundos, sin esperas ni incertidumbre sobre tu compra.</p>
+                </div>
+                <div class="porque-card">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <h3>Reembolsos sin complicaciones</h3>
+                    <p>Si algo no sale como esperabas, tu reembolso se procesa directo por la misma vía de pago.</p>
+                </div>
+                <div class="porque-card">
+                    <i class="fa-solid fa-headset"></i>
+                    <h3>Soporte cercano</h3>
+                    <p>Estamos disponibles para acompañarte antes, durante y después de tu compra.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cómo comprar -->
+        <section class="como-comprar container">
+            <h2>Comprar es así de simple</h2>
+            <div class="pasos-grid">
+                <div class="paso-card">
+                    <span class="paso-numero">1</span>
+                    <h3>Elige tus productos</h3>
+                    <p>Agrégalos al carrito desde cualquier parte del sitio, sin perder lo que ya llevas.</p>
+                </div>
+                <div class="paso-card">
+                    <span class="paso-numero">2</span>
+                    <h3>Paga con Sypago</h3>
+                    <p>Ingresa tu banco y confirma con el código que te llega por SMS o notificación bancaria.</p>
+                </div>
+                <div class="paso-card">
+                    <span class="paso-numero">3</span>
+                    <h3>Listo</h3>
+                    <p>Recibes la confirmación al instante y tu compra queda registrada.</p>
+                </div>
+            </div>
+        </section>
+
         <section class="promociones container" id="lista-1">
 
             <h2>Promociones</h2>
 
-            <div class="secciones"> <!--para no poner "categorias", que ira en el carrusel de productos -->
+            <div class="secciones">
 
                 <div class="seccion">
                     <div class="seccion-1">
-                        <h3>Promoción 1</h3>
+                        <h3>Camisa Oficial SyPago</h3>
                         <div class="precios">
-                            <p class="precio-1">$19.50</p>
                             <p class="precio-2">$15.00</p>
                         </div>
-                        <a href="#" class="agregar-carrito btn-3" data-id="1">Agregar al Carrito</a>
+                        <a href="#" class="agregar-carrito btn-3"
+                           data-nombre="Camisa Oficial SyPago"
+                           data-precio="15.00"
+                           data-imagen="/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png">
+                            Agregar al Carrito
+                        </a>
                     </div>
                     <div class="seccion-img">
-                        <img src="/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png"
-                            alt="" loading="lazy">
+                        <img src="/static/img/Gemini_Generated_Image_gl3lkjgl3lkjgl3l.png" alt="Camisa Oficial SyPago" loading="lazy">
                     </div>
                 </div>
 
                 <div class="seccion">
                     <div class="seccion-1">
-                        <h3>Promoción 2</h3>
+                        <h3>Taza Termica SyPago</h3>
                         <div class="precios">
-                            <p class="precio-1">$26.65</p>
-                            <p class="precio-2">$20.50</p>
-                        </div>
-                        <a href="#" class="agregar-carrito btn-3" data-id="2">Agregar al Carrito</a>
-                    </div>
-                    <div class="seccion-img">
-                        <img src="/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png"
-                            alt="" loading="lazy">
-                    </div>
-                </div>
-
-                <div class="seccion">
-                    <div class="seccion-1">
-                        <h3>Promoción 3</h3>
-                        <div class="precios">
-                            <p class="precio-1">$11.05</p>
                             <p class="precio-2">$8.50</p>
                         </div>
-                        <a href="#" class="agregar-carrito btn-3" data-id="3">Agregar al Carrito</a>
+                        <a href="#" class="agregar-carrito btn-3"
+                           data-nombre="Taza Termica SyPago"
+                           data-precio="8.50"
+                           data-imagen="/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png">
+                            Agregar al Carrito
+                        </a>
                     </div>
                     <div class="seccion-img">
-                        <img src="/static/img/Gorra_Sypago.png"
-                            alt="" loading="lazy">
+                        <img src="/static/img/Gemini_Generated_Image_jq6re6jq6re6jq6r.png" alt="Taza Termica SyPago" loading="lazy">
+                    </div>
+                </div>
+
+                <div class="seccion">
+                    <div class="seccion-1">
+                        <h3>Laptop Pro 15"</h3>
+                        <div class="precios">
+                            <p class="precio-2">$850.00</p>
+                        </div>
+                        <a href="#" class="agregar-carrito btn-3"
+                           data-nombre="Laptop Pro 15&quot;"
+                           data-precio="850.00"
+                           data-imagen="/static/img/Laptop_Pro_15.png">
+                            Agregar al Carrito
+                        </a>
+                    </div>
+                    <div class="seccion-img">
+                        <img src="/static/img/Laptop_Pro_15.png" alt="Laptop Pro 15 pulgadas" loading="lazy">
                     </div>
                 </div>
 
@@ -222,15 +310,15 @@
                     <path d="M16.46 29.91C16.46 29.91 16.45 29.8897 16.46 29.8997C16.46 29.9097 16.4504 29.9197 16.4404 29.8997L16.46 29.91Z" fill="black"/>
                 </svg>
                 <p>
-                    Somos una compañía especializada en servicios de consultoría de negocio, desarrollo tecnológico, 
+                    Somos una compañía especializada en servicios de consultoría de negocio, desarrollo tecnológico,
                     transformación digital y outsourcing.
                 </p>
-            </div>            
+            </div>
 
             <div class="link">
                 <h3>Ubicación:</h3>
                 <p>
-                    Av. Los Manguitos, entre Av. Libertador y Av. Solano, Torre Mega III, Piso 6, Ofic. 6-A, Sabana Grande, 
+                    Av. Los Manguitos, entre Av. Libertador y Av. Solano, Torre Mega III, Piso 6, Ofic. 6-A, Sabana Grande,
                     Caracas – Venezuela.
                 </p>
             </div>
